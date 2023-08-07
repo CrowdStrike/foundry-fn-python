@@ -1,0 +1,8 @@
+[project]
+name = "crowdstrike-foundry-function"
+description = "CrowdStrike Foundry Function Software Developer Kit for Python"
+requires-python = ">=3.9.0,<3.10.0"
+dynamic = ['dependencies', 'version']
+
+[build-system]
+requires = ['setuptools>=67.7.2']

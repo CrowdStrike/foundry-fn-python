@@ -1,0 +1,36 @@
+cff-version: 1.2.0
+title: 'CrowdStrike Foundry Function as a Service for Python'
+message: >-
+  If you use this software, and wish to cite the origins, 
+  please use metadata from this file.
+type: software
+authors:
+  - given-names: 
+    family-names: CrowdStrike
+    email: foundry-fn-python@crowdstrike.com
+  - given-names: John
+    family-names: Stone
+    affiliation: CrowdStrike
+  - given-names: Chris
+    family-names: Cannon
+    affiliation: CrowdStrike
+repository-code: 'https://github.com/CrowdStrike/foundry-fn-python'
+url: 'https://www.crowdstrike.com'
+repository-artifact: 'https://pypi.org/project/crowdstrike-foundry/'
+abstract: >-
+  The CrowdStrike Foundry Function as a Service SDK
+  is a community-driven, open source project designed
+  to enable the authoring of functions within the
+  CrowdStrike Foundry ecosystem.
+keywords:
+  - crowdstrike
+  - oauth2
+  - crowdstrike-api
+  - crowdstrike-falcon-api
+  - crowdstrike-foundry
+  - crowdstrike-ffaas
+  - python
+  - windows
+  - linux
+  - mac
+license: MIT
