@@ -1,4 +1,4 @@
-![CrowdStrike Falcon](/docs/asset/cs-logo.png?raw=true)
+![CrowdStrike Falcon](https://raw.githubusercontent.com/CrowdStrike/foundry-fn-python/main/docs/asset/cs-logo.png)
 
 # Foundry Function as a Service Python SDK
 
@@ -13,7 +13,7 @@ with the open source developer community.
 The SDK can be installed or updated via `pip install`:
 
 ```shell
-python3 -m pip install crowdstrike-foundry-fn-python
+python3 -m pip install crowdstrike-foundry-function
 ```
 
 ## Quickstart 💫
@@ -150,5 +150,5 @@ class Handler(HandlerBase):
 ---
 
 
-<p align="center"><img src="https://raw.githubusercontent.com/CrowdStrike/falconpy/main/docs/asset/cs-logo-footer.png"><BR/><img width="250px" src="https://raw.githubusercontent.com/CrowdStrike/falconpy/main/docs/asset/adversary-red-eyes.png"></P>
+<p align="center"><img src="https://raw.githubusercontent.com/CrowdStrike/foundry-fn-python/main/docs/asset/cs-logo-footer.png"><BR/><img width="250px" src="https://raw.githubusercontent.com/CrowdStrike/foundry-fn-python/main/docs/asset/adversary-red-eyes.png"></P>
 <h3><P align="center">WE STOP BREACHES</P></h3>

@@ -16,7 +16,18 @@ PYTHON_VERSION = '>=3.9.0,<3.10.0'
 SETUP_REQUIRES = [
     'setuptools',
 ]
-VERSION='0.2.0'
+VERSION='0.3.0'
+
+with open("README.md", "r", encoding="utf-8") as fh:
+    long_description = fh.read()
+
+# Remove GitHub's emoji
+emojis = [
+    ":speech_balloon: ", ":bulb: ", ":pray: ", ":raised_hands: ", " :fire:", ":fire: ",
+    "<small>", "</small>", " :mag_right:", " :dizzy:", " :memo:", " :coffee:", " :book:"
+    ]
+for emoji in emojis:
+    long_description = long_description.replace(emoji, "")
 
 
 def main():
@@ -29,6 +40,8 @@ def main():
         python_requires=PYTHON_VERSION,
         setup_requires=SETUP_REQUIRES,
         version=VERSION,
+        long_description=long_description,
+        long_description_content_type="text/markdown",
     )
 
 
