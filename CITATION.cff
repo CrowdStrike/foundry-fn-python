@@ -14,6 +14,9 @@ authors:
   - given-names: Chris
     family-names: Cannon
     affiliation: CrowdStrike
+  - given-names: Johnny
+    family-names: Steenbergen
+    affiliation: CrowdStrike
 repository-code: 'https://github.com/CrowdStrike/foundry-fn-python'
 url: 'https://www.crowdstrike.com'
 repository-artifact: 'https://pypi.org/project/crowdstrike-foundry/'
