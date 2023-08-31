@@ -52,6 +52,24 @@ def map_dict_to_dataclass(d: Dict, dc) -> [None, dataclass]:
     return dc
 
 
+def _canonize_header(h: str) -> str:
+    """
+    Converts a header key into its canonical version.
+    :param h: Header key.
+    :return: Canonized version.
+    """
+    canon = ''
+    upper = True
+    for c in h:
+        if upper:
+            canon += c.upper()
+        else:
+            canon += c.lower()
+
+        upper = c == '-'
+    return canon
+
+
 @dataclass
 class APIError:
     """
@@ -102,6 +120,11 @@ class Request:
         req_dict = json.loads(payload)
         req = map_dict_to_dataclass(req_dict, Request())
         req.params = map_dict_to_dataclass(req_dict.get('params', None), Params())
+        if req.params.header is not None and len(req.params.header) > 0:
+            h = {}
+            for k, v in req.params.header.items():
+                h[_canonize_header(k)] = v
+            req.params.header = h
         return req
 
 

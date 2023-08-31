@@ -37,7 +37,9 @@ class TestRequest(unittest.TestCase):
             method='GET',
             params=Params(
                 header={
-                    'xyz': ['a', 'b'],
+                    'Accepts': ['application/json'],
+                    'Content-Type': ['application/json'],
+                    'Xyz': ['a', 'b'],
                 },
                 query={
                     'ijk': ['4', '5', '6'],
@@ -56,6 +58,8 @@ class TestRequest(unittest.TestCase):
             'method': 'GET',
             'params': {
                 'header': {
+                    'accepts': ['application/json'],
+                    'ContENt-type': ['application/json'],
                     'xyz': ['a', 'b'],
                 },
                 'query': {
