@@ -1,27 +1,14 @@
-import json
 import unittest
 from crowdstrike.foundry.function.model import (
-    APIError,
-    Params,
+    RequestParams,
     Request,
+)
+from crowdstrike.foundry.function.mapping import (
+    dict_to_request,
 )
 
 if __name__ == '__main__':
     unittest.main()
-
-
-class TestAPIError(unittest.TestCase):
-    def test_to_dict(self):
-        actual = APIError(
-            code=123,
-            message='hello world',
-        ).to_dict()
-        expected = {
-            'code': 123,
-            'message': 'hello world',
-        }
-
-        self.assertEqual(expected, actual, f'expected={expected} but got {actual}')
 
 
 class TestRequest(unittest.TestCase):
@@ -35,7 +22,7 @@ class TestRequest(unittest.TestCase):
                 'goodnight': 'moon',
             },
             method='GET',
-            params=Params(
+            params=RequestParams(
                 header={
                     'Accepts': ['application/json'],
                     'Content-Type': ['application/json'],
@@ -48,7 +35,7 @@ class TestRequest(unittest.TestCase):
             url='/qwerty',
         )
 
-        payload = json.dumps({
+        payload = {
             'body': {
                 'hello': 'world',
             },
@@ -67,7 +54,7 @@ class TestRequest(unittest.TestCase):
                 },
             },
             'url': '/qwerty',
-        })
-        actual = Request.from_json_payload(payload)
+        }
+        actual = dict_to_request(payload)
 
         self.assertEqual(expected, actual, f'expected={expected} but got {actual}')

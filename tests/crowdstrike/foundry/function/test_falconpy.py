@@ -1,13 +1,9 @@
 import os
 import unittest
 from unittest.mock import patch
-from crowdstrike.foundry.function.falconpy import (
-    falcon_client,
-)
-from crowdstrike.foundry.function.model import (
-    Request,
-    ctx_request,
-)
+from crowdstrike.foundry.function.context import ctx_request
+from crowdstrike.foundry.function.falconpy import  falcon_client
+from crowdstrike.foundry.function.model import  Request
 from falconpy import Hosts
 
 if __name__ == '__main__':

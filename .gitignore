@@ -27,5 +27,4 @@ hold
 htmlcov
 sensor_downloads
 test-results.xml
-tests/_*
 venv

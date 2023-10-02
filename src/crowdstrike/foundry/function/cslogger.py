@@ -1,9 +1,7 @@
 import logging
 import os
 import sys
-from typing import (
-    Any,
-)
+from typing import Any
 
 
 def get_log_level() -> str:
@@ -52,31 +50,12 @@ class CSLogger(logging.Logger):
         """
         logging.Logger.__init__(self, name, level.upper())
         self._level = level.upper()
-        self._extras = {}
         self._logger = logging.Logger(name, self._level)
         self._name = name
 
     def addHandler(self, hdlr: logging.Handler):
         logging.Logger.addHandler(self, hdlr)
         self._logger.addHandler(hdlr)
-
-    def extra(self, key: str, value: [str, None]) -> 'CSLogger':
-        """
-        Adds any extra (key, value) pair that the author would like to include when logging.
-        Provide a value of `None` to remove the key from the collection.
-        :param key: Key to log.
-        :param value: Value to log.
-        :return: Clone of self with the modification.
-        """
-        extras = self._extras
-        if value is None:
-            if key in self._extras:
-                del extras[key]
-        else:
-            self._extras[key] = value
-        clone = self._clone(False)
-        clone._extras = extras
-        return clone
 
     def critical(self, msg, *args, **kwargs):
         self._logger.critical(self._prepare_msg(msg), *args, **kwargs)
@@ -100,14 +79,6 @@ class CSLogger(logging.Logger):
         self._logger.warning(self._prepare_msg(msg), *args, **kwargs)
 
     def _prepare_msg(self, msg: [str, Any]) -> str:
-        msg_dict = {**self._extras, **{'msg': msg}}
+        msg_dict = {'msg': msg}
         msg_str = '\t'.join(f'{k}={v}' for k, v in msg_dict.items())
         return msg_str
-
-    def _clone(self, include_extras: bool) -> 'CSLogger':
-        clone = CSLogger(self._name, self._level)
-        for h in self.handlers:
-            clone.addHandler(h)
-        if include_extras:
-            clone._extras = {**self._extras, **{}}
-        return clone

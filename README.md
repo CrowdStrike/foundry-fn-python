@@ -24,60 +24,55 @@ Add the SDK to your project by following the [installation](#installation) instr
 then create your `handler.py`:
 
 ```python
-import http
+import logging
 from crowdstrike.foundry.function import (
-    CSHandler,
-    HandlerBase,
+    APIError,
     Request,
     Response,
-    run,
+    Function,
 )
+from typing import Dict
+
+func = Function.instance()  # *** (1) ***
 
 
-class Handler(HandlerBase):  # *** (1) ***
-
-    def handler_init(self):  # *** (2) ***
-        msg = f'initializing using configuration: {self.config()}'  # *** (3) ***
-        self.logger().info(msg)  # *** (4) ***
-
-    # *** (5) ***
-    def handle(self, request: Request) -> Response:  # *** (6) ***
-        body = {
-            'body': request.body,
-            'context': request.context,
-            'method': request.method,
-            'url': request.url,
-        }
-
-        return Response(  # *** (7) ***
-            body=body,
-            code=http.HTTPStatus.OK,
-        )
+@func.handler(method='POST', path='/create')  # *** (2) ***
+def on_create(request: Request, logger: logging.Logger, config: [Dict[str, any], None]) -> Response:  # *** (3), (4) ***
+    # do something
+    body = {
+        'hello': 'world',
+    }
+    return Response(  # *** (5) ***
+        body=body,
+        code=200,
+    )
 
 
-if __name__ == '__main__':  # *** (8) ***
-    CSHandler.bootstrap(Handler)
-    run()
+@func.handler(method='GET', path='/fetch', provide_logger=False, provide_config=False)
+def on_fetch(request: Request) -> Response:
+    # do something
+    return Response(
+        errors=[APIError(code=404, message='no such resource')],
+    )
+
+
+if __name__ == '__main__':
+    func.run()  # *** (6) ***
 ```
 
-1. `Handler(HandlerBase)`: Class containing the function's code.
-   The `Handler` class must extend `HandlerBase`, must be present in `handler.py`, and should not have an `__init__`
-   method.
-   If an `__init__` method is provided, it will be overridden internally as the framework constructs the handler.
-2. `handler_init`: Initialization and bootstrapping method.
-   The framework will invoke the `handler_init` following construction and basic initialization of the handler;
-   invocation occurs exactly once at the start of the runtime.
-   Implementing this function is optional and may be removed from the handler if no custom bootstrapping or setup is
-   needed.
-3. `self.config()`: Configuration dictionary of type `dict[str, Any]`.
-   This is populated as part of the bootstrapping process and is accessible within both `handler_init` and `handle`.
-   The same instance of the dictionary is returned on each invocation of this method.
-4. `self.logger()`: Contextual `logging.Logger` instance.
-   While the author is free to implement or import their own logger, the framework provides a version of `Logger`
-   which outputs (in production) in JSON format and decorates the output with valuable contextual information.
-   It is recommended that function authors use the provided `Logger` unless they have good reason not to.
-5. `handle()`: Called once on each inbound request. The business logic of the function should exist here.
-6. `request`: Request payload and metadata. At the time of this writing, the `Request` object consists of:
+1. `Function`: The `Function` class wraps the function.
+   Each `Function` instance consists of a number of handlers, with each handler corresponding to an endpoint.
+   A script should have exactly one `Function`.
+2. `@func.handler`: The `handler` decorator defines a function in your script as an endpoint.
+   At a minimum, the `handler` must have a `method` and a `path`.
+   The `method` must be one of `DELETE`, `GET`, `PATCH`, `POST`, and `PUT`.
+   The `path` corresponds to the `url` field in the request.
+   By default, the SDK will provide a `logging.Logger` and any loaded configuration;
+   these can be toggled off through the use of the `provide_logger` and `provide_config` options.
+3. Functions decorated with `handler` must take arguments in the order of `Request`, `logging.Logger`, and `Dict`
+   and must return a `Response`. If either or both of `provide_logger` or `provide_config` is False, the corresponding
+   argument should be omitted from the function signature.
+4. `request`: Request payload and metadata. At the time of this writing, the `Request` object consists of:
     1. `body`: The request payload as given in the Function Gateway `body` payload field. Will be deserialized as
        a `dict[str, Any]`.
     2. `params`: Contains request headers and query parameters.
@@ -85,14 +80,15 @@ if __name__ == '__main__':  # *** (8) ***
     4. `method`: The request HTTP method or verb.
     5. `context`: Caller-supplied raw context.
     6. `access_token`: Caller-supplied access token.
-7. Return from `handle()`: Returns a `Response` object.
+5. Return from a `@handler` function: Returns a `Response` object.
    The `Response` object contains fields `body` (payload of the response as a `dict`),
-   `code` (an `int` representing an HTTP status code or a member of `http.HTTPStatus`),
-   `errors` (a list of any `APIError`s), and `headers` (a `dict[str, list[str]]` of any special HTTP headers which
+   `code` (an `int` representing an HTTP status code),
+   `errors` (a list of any `APIError`s), and `header` (a `dict[str, list[str]]` of any special HTTP headers which
    should be present on the response).
-8. `if __name__ == '__main__': ...`: Enables local testing of the function.
-   Code placed in this block only serves to enable the author to run their function locally and is ignored in
-   production.
+6. `func.run()`: Runner method and general starting point of execution.
+   Calling `run()` causes the application to be initialized and start executing.
+   Any code declared following this method may not necessarily be executed.
+   As such, it is recommended to place this as the last line of your script.
 
 ### Testing locally
 
@@ -100,7 +96,7 @@ The SDK provides an out-of-the-box runtime for executing the function.
 A basic HTTP server will be listening on port 8081.
 
 ```shell
-cd my-project && python3 handler.py
+cd my-project && python3 main.py
 ```
 
 Requests can now be made against the executable.
@@ -113,7 +109,7 @@ curl -X POST 'http://localhost:8081' \
         "foo": "bar"
     },
     "method": "POST",
-    "url": "/echo"
+    "url": "/create"
 }'
 ```
 
@@ -121,7 +117,8 @@ curl -X POST 'http://localhost:8081' \
 
 ### `falconpy`
 
-Foundry Function Python ships with [falconpy](https://github.com/CrowdStrike/falconpy) pre-integrated and a convenience constructor.
+Foundry Function Python ships with [falconpy](https://github.com/CrowdStrike/falconpy) pre-integrated and a convenience
+constructor.
 While it is not strictly necessary to use the convenience function, it is recommended.
 
 **Important:** Create a new instance of each `falconpy` client you want on each request.
@@ -130,23 +127,24 @@ While it is not strictly necessary to use the convenience function, it is recomm
 # omitting other imports
 from falconpy.alerts import Alerts
 from falconpy.event_streams import EventStreams
-from crowdstrike.foundry.function.falconpy import falcon_client
+from crowdstrike.foundry.function import falcon_client, Function
+
+func = Function.instance()
 
 
-class Handler(HandlerBase):
+@func.handler(...)
+def endpoint(request, logger, config):
+    # ... omitting other code ...
+    # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    # !!! create a new client instance on each request !!!
+    # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-    def handle(self, request: Request) -> Response:
-        # ... omitting other code ...
+    alerts_client = falcon_client(Alerts)
+    event_streams_client = falcon_client(EventStreams)
 
-        # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        # !!! create a new client instance on each request !!!
-        # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        
-        alerts_client = falcon_client(Alerts)
-        event_streams_client = falcon_client(EventStreams)
-
-        # ... omitting other code ...
+    # ... omitting other code ...
 ```
+
 ---
 
 

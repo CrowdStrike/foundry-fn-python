@@ -12,22 +12,11 @@ PACKAGE_DIR = {
 PACKAGES = [
     'crowdstrike.foundry.function',
 ]
-PYTHON_VERSION = '>=3.9.0,<3.10.0'
+PYTHON_VERSION = '>=3.9.0'
 SETUP_REQUIRES = [
     'setuptools',
 ]
-VERSION='0.3.0'
-
-with open("README.md", "r", encoding="utf-8") as fh:
-    long_description = fh.read()
-
-# Remove GitHub's emoji
-emojis = [
-    ":speech_balloon: ", ":bulb: ", ":pray: ", ":raised_hands: ", " :fire:", ":fire: ",
-    "<small>", "</small>", " :mag_right:", " :dizzy:", " :memo:", " :coffee:", " :book:"
-    ]
-for emoji in emojis:
-    long_description = long_description.replace(emoji, "")
+VERSION = '0.5.0'
 
 
 def main():
@@ -40,7 +29,7 @@ def main():
         python_requires=PYTHON_VERSION,
         setup_requires=SETUP_REQUIRES,
         version=VERSION,
-        long_description=long_description,
+        long_description=long_description(),
         long_description_content_type="text/markdown",
     )
 
@@ -48,6 +37,20 @@ def main():
 def find_dependencies(requirements) -> List[str]:
     with open(requirements, 'r') as reqs:
         return [line for line in sanitized_lines(reqs.readlines())]
+
+
+def long_description() -> str:
+    with open("README.md", "r", encoding="utf-8") as fh:
+        descript = fh.read()
+
+    # Remove GitHub's emoji
+    emojis = [
+        ":speech_balloon: ", ":bulb: ", ":pray: ", ":raised_hands: ", " :fire:", ":fire: ",
+        "<small>", "</small>", " :mag_right:", " :dizzy:", " :memo:", " :coffee:", " :book:"
+    ]
+    for emoji in emojis:
+        descript = descript.replace(emoji, "")
+    return descript
 
 
 def sanitized_lines(lines: List[str]):
