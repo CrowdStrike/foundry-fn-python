@@ -81,7 +81,7 @@ class Function:
             self._loader = Loader()
         if self._router is None:
             from crowdstrike.foundry.function.router import Router
-            self.router = Router(self._logger, self._config)
+            self._router = Router(self._logger, self._config)
         if self._runner is None:
             from crowdstrike.foundry.function.runner import Runner
             from crowdstrike.foundry.function.runner_http import HTTPRunner
