@@ -78,8 +78,7 @@ if __name__ == '__main__':
     2. `params`: Contains request headers and query parameters.
     3. `url`: The request path relative to the function as a string.
     4. `method`: The request HTTP method or verb.
-    5. `context`: Caller-supplied raw context.
-    6. `access_token`: Caller-supplied access token.
+    5. `access_token`: Caller-supplied access token.
 5. Return from a `@handler` function: Returns a `Response` object.
    The `Response` object contains fields `body` (payload of the response as a `dict`),
    `code` (an `int` representing an HTTP status code),
