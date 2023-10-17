@@ -1,9 +1,7 @@
 import os
-from crowdstrike.foundry.function.model import ctx_request
+from crowdstrike.foundry.function.context import ctx_request
 from falconpy import ServiceClass
 from typing import Type
-
-_cloud_default = 'auto'
 
 
 def falcon_client(client_class: Type) -> ServiceClass:
@@ -12,6 +10,7 @@ def falcon_client(client_class: Type) -> ServiceClass:
     :param client_class: Class which extends :class:`falconpy.ServiceClass`.
     :return: Initialized instance of the client_class.
     """
+    _cloud_default = 'auto'
     if not issubclass(client_class, ServiceClass):
         msg = f'provided class {client_class.__name__} does not extend falconpy.ServiceClass'
         raise TypeError(msg)

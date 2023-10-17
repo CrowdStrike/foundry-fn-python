@@ -1,5 +1,5 @@
 import unittest
-from crowdstrike.foundry.function.logger import (
+from crowdstrike.foundry.function.cslogger import (
     CSLogger,
     _get_log_level,
 )
@@ -32,16 +32,6 @@ class TestLoggerUtilities(unittest.TestCase):
 
 class TestLogger(unittest.TestCase):
 
-    def test_extra(self):
-        log = CSLogger(__name__, 'INFO')
-        self.assertEqual(0, len(log._extras), 'expects empty initial dict')
-
-        log.extra('a', 'b').extra('c', None).extra('d', 'e')
-        self.assertEqual({'a': 'b', 'd': 'e'}, log._extras, 'expects adding non-None values inserts values')
-
-        log.extra('a', None).extra('d', 'f')
-        self.assertEqual({'d': 'f'}, log._extras, 'expects adding None removes value and adding existing overwrites')
-
     def test__prepare_msg(self):
-        log = CSLogger(__name__, 'INFO').extra('a', 'b')
-        self.assertEqual('a=b\tmsg=hello', log._prepare_msg('hello'))
+        log = CSLogger(__name__, 'INFO')
+        self.assertEqual('msg=hello', log._prepare_msg('hello'))

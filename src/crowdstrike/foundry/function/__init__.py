@@ -1,56 +1,118 @@
-from abc import ABC
-from argparse import ArgumentParser
-from http.server import HTTPServer
-from crowdstrike.foundry.function.handler import Handler
-from crowdstrike.foundry.function.handler_base import HandlerBase as PySlHandlerBase
-from crowdstrike.foundry.function.logger import new_logger
-from crowdstrike.foundry.function.model import (
-    Request,
-    Response,
-)
-from typing import Type
+from crowdstrike.foundry.function.falconpy import falcon_client
+from crowdstrike.foundry.function.model import *
 
 
-def run():
+class Function:
     """
-    Driver function.
+    Represents a Function.
     """
-    parser = ArgumentParser()
-    parser.add_argument('-p', '--port',
-                        default=8081,
-                        type=int,
-                        help='port on which to start the test HTTP server (default 8081)')
-    args = parser.parse_args()
 
-    if not 1024 <= args.port < 65536:
-        raise AssertionError('port must be in range [1024, 65536)')
-
-    Handler.logger.info(f'starting server at localhost:{args.port}')
-    HTTPServer(('0.0.0.0', args.port), Handler).serve_forever()
-
-
-class HandlerBase(PySlHandlerBase, ABC):
-    """
-    Base class for custom SDK handlers.
-    """
-    pass
-
-
-class CSHandler:
-    """
-    CrowdStrike SDK handler driver.
-    """
-    bootstrapped: bool = False
+    _instance: ['Function', None] = None
 
     @staticmethod
-    def bootstrap(handler_class: Type):
+    def instance(
+            module: str = '',
+            config=None,
+            config_loader=None,
+            loader=None,
+            logger=None,
+            router=None,
+            runner=None,
+    ) -> 'Function':
         """
-        Bootstraps the CSHandler class by loading any needed configuration, creating loggers,
-        and constructing an instance of the handler.
-        :param handler_class: Class from which to construct the :class:`HandlerBase`.
-        This must extend :class:`HandlerBase`.
+        Fetch the singleton instance of the :class:`Function`, creating one if one does not yet exist.
+        :param module: Name of the module in which code should be imported.
+        :param config: Configuration to provide to the user's code.
+        :param config_loader: :class:`ConfigLoaderBase` instance capable of loading configuration if `config` is None.
+        :param loader: :class:`Loader` instance.
+        :param logger: :class:`logging.Logger` instance.
+        :param router: :class:`Router` instance.
+        :param runner: :class:`RunnerBase` instance.
+        :returns: :class:`Function` singleton.
         """
-        if not CSHandler.bootstrapped:
-            Handler.load()
-            Handler.bind_handler(handler_class)
-            Handler.bootstrapped = True
+        if Function._instance is None:
+            Function._instance = Function(
+                module=module,
+                config=config,
+                config_loader=config_loader,
+                loader=loader,
+                logger=logger,
+                router=router,
+                runner=runner,
+            )
+        return Function._instance
+
+    def __init__(
+            self,
+            module: str = '',
+            config=None,
+            config_loader=None,
+            loader=None,
+            logger=None,
+            router=None,
+            runner=None,
+    ):
+        """
+        :param module: Name of the module in which code should be imported.
+        :param config: Configuration to provide to the user's code.
+        :param config_loader: :class:`ConfigLoaderBase` instance capable of loading configuration if `config` is None.
+        :param loader: :class:`Loader` instance.
+        :param logger: :class:`logging.Logger` instance.
+        :param router: :class:`Router` instance.
+        :param runner: :class:`RunnerBase` instance.
+        """
+        self._config = config
+        self._loader = loader
+        self._logger = logger
+        self._router = router
+        self._runner = runner
+
+        if self._logger is None:
+            from crowdstrike.foundry.function.cslogger import new_logger
+            self._logger = new_logger()
+        if self._config is None:
+            if config_loader is None:
+                from crowdstrike.foundry.function.config_loader import ConfigLoader
+                from crowdstrike.foundry.function.config_loader_fs import FileSystemConfigLoader
+                config_loader = ConfigLoader(FileSystemConfigLoader())
+            self._config = config_loader.load(self._logger)
+        if self._loader is None:
+            from crowdstrike.foundry.function.loader import Loader
+            self._loader = Loader()
+        if self._router is None:
+            from crowdstrike.foundry.function.router import Router
+            self._router = Router(self._logger, self._config)
+        if self._runner is None:
+            from crowdstrike.foundry.function.runner import Runner
+            from crowdstrike.foundry.function.runner_http import HTTPRunner
+            self._runner = Runner(HTTPRunner())
+            self._runner.bind_logger(self._logger)
+            self._runner.bind_router(self._router)
+
+        self._loader.register_module(module)
+
+    def run(self, *args, **kwargs):
+        """
+        Runs the function. Essentially the "main" method of the function.
+        Any arguments provided to this method are forwarded directly down into :class:`RunnerBase` instance.
+        :return: Any result from the given :class:`RunnerBase` instance.
+        """
+        self._loader.load()
+        return self._runner.run(*args, **kwargs)
+
+    def handler(self, method: str, path: str):
+        """
+        Decorator for handlers.
+        :param method: HTTP method or verb to bind to this handler.
+        :param path: URL path at which this handler resides.
+        """
+
+        def call(func):
+            from crowdstrike.foundry.function.router import Route
+            self._router.register(Route(
+                func=func,
+                method=method,
+                path=path,
+            ))
+
+        return call

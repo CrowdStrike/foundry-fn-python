@@ -1,36 +1,37 @@
-import json
-import os
-from logging import Logger
-from typing import (
-    Any,
-    Dict,
-)
-
-CONFIG_PATH_ENV_VAR = 'CS_FN_CONFIG_PATH'
+import logging
+from abc import ABC, abstractmethod
 
 
-def load_config(logger: [Logger, None] = None) -> [Dict[str, Any], None]:
+class ConfigLoaderBase(ABC):
     """
-    Loads configuration.
-    :param logger: `Logger` instance.
-    :return: Any loaded configuration as a dict, or None if no value exists for the CS_FN_CONFIG_PATH environment
-    variable.
-    :raises AssertionError: Successfully read the configuration file but the file was considered empty.
+    Base class for any class which is able to load configuration.
     """
-    config_path = os.environ.get(CONFIG_PATH_ENV_VAR, '')
-    if config_path is None or config_path.strip() == '':
-        msg = f'No value provided for configuration environment variable "{CONFIG_PATH_ENV_VAR}".' \
-              ' Configuration will be None.'
-        if logger is None:
-            print(msg)
-        else:
-            logger.warning(msg)
-        return None
 
-    with open(config_path.strip()) as fp:
-        contents = ''.join(line.strip() for line in fp.readlines())
+    @abstractmethod
+    def load(self, logger: logging.Logger):
+        """
+        Loads the configuration.
+        :param logger: :class:`logging.Logger` instance.
+        """
+        pass
 
-    if contents == '':
-        msg = f'successfully read configuration file "{config_path.strip()}" but no non-blank lines were read'
-        raise AssertionError(msg)
-    return json.loads(contents)
+
+class ConfigLoader(ConfigLoaderBase):
+    """
+    Middleware for loading configuration.
+    """
+
+    def __init__(self, loader: ConfigLoaderBase):
+        """
+        :param loader: Desired :class:`ConfigLoaderBase` instance.
+        """
+        ConfigLoaderBase.__init__(self)
+        self._loader = loader
+
+    def load(self, logger: logging.Logger):
+        """
+        Loads the configuration.
+        :param logger: :class:`logging.Logger` instance.
+        :returns: Any loaded configuration.
+        """
+        return self._loader.load(logger)
