@@ -1,4 +1,3 @@
-import logging
 from abc import ABC, abstractmethod
 
 
@@ -8,10 +7,9 @@ class ConfigLoaderBase(ABC):
     """
 
     @abstractmethod
-    def load(self, logger: logging.Logger):
+    def load(self):
         """
         Loads the configuration.
-        :param logger: :class:`logging.Logger` instance.
         """
         pass
 
@@ -28,10 +26,9 @@ class ConfigLoader(ConfigLoaderBase):
         ConfigLoaderBase.__init__(self)
         self._loader = loader
 
-    def load(self, logger: logging.Logger):
+    def load(self):
         """
         Loads the configuration.
-        :param logger: :class:`logging.Logger` instance.
         :returns: Any loaded configuration.
         """
-        return self._loader.load(logger)
+        return self._loader.load()

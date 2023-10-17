@@ -15,7 +15,6 @@ class Function:
             config=None,
             config_loader=None,
             loader=None,
-            logger=None,
             router=None,
             runner=None,
     ) -> 'Function':
@@ -25,7 +24,6 @@ class Function:
         :param config: Configuration to provide to the user's code.
         :param config_loader: :class:`ConfigLoaderBase` instance capable of loading configuration if `config` is None.
         :param loader: :class:`Loader` instance.
-        :param logger: :class:`logging.Logger` instance.
         :param router: :class:`Router` instance.
         :param runner: :class:`RunnerBase` instance.
         :returns: :class:`Function` singleton.
@@ -36,7 +34,6 @@ class Function:
                 config=config,
                 config_loader=config_loader,
                 loader=loader,
-                logger=logger,
                 router=router,
                 runner=runner,
             )
@@ -48,7 +45,6 @@ class Function:
             config=None,
             config_loader=None,
             loader=None,
-            logger=None,
             router=None,
             runner=None,
     ):
@@ -57,36 +53,30 @@ class Function:
         :param config: Configuration to provide to the user's code.
         :param config_loader: :class:`ConfigLoaderBase` instance capable of loading configuration if `config` is None.
         :param loader: :class:`Loader` instance.
-        :param logger: :class:`logging.Logger` instance.
         :param router: :class:`Router` instance.
         :param runner: :class:`RunnerBase` instance.
         """
         self._config = config
         self._loader = loader
-        self._logger = logger
         self._router = router
         self._runner = runner
 
-        if self._logger is None:
-            from crowdstrike.foundry.function.cslogger import new_logger
-            self._logger = new_logger()
         if self._config is None:
             if config_loader is None:
                 from crowdstrike.foundry.function.config_loader import ConfigLoader
                 from crowdstrike.foundry.function.config_loader_fs import FileSystemConfigLoader
                 config_loader = ConfigLoader(FileSystemConfigLoader())
-            self._config = config_loader.load(self._logger)
+            self._config = config_loader.load()
         if self._loader is None:
             from crowdstrike.foundry.function.loader import Loader
             self._loader = Loader()
         if self._router is None:
             from crowdstrike.foundry.function.router import Router
-            self._router = Router(self._logger, self._config)
+            self._router = Router(self._config)
         if self._runner is None:
             from crowdstrike.foundry.function.runner import Runner
             from crowdstrike.foundry.function.runner_http import HTTPRunner
             self._runner = Runner(HTTPRunner())
-            self._runner.bind_logger(self._logger)
             self._runner.bind_router(self._router)
 
         self._loader.register_module(module)

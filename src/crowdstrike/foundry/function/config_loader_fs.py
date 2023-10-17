@@ -1,4 +1,3 @@
-import logging
 import json
 import os
 from crowdstrike.foundry.function.config_loader import ConfigLoaderBase
@@ -12,12 +11,11 @@ class FileSystemConfigLoader(ConfigLoaderBase):
     def __init__(self):
         ConfigLoaderBase.__init__(self)
 
-    def load(self, logger: logging.Logger = None):
+    def load(self):
         """
         Loads the configuration located at the path specified in the `CS_FN_CONFIG_PATH` environment variable.
         The path may be either relative or absolute.
         If the environment variable is not provided, no configuration will be loaded.
-        :param logger: :class:`logging.Logger` instance.
         :returns: Any loaded configuration.
         """
         file_path = os.environ.get('CS_FN_CONFIG_PATH', None)

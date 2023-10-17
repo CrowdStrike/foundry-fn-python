@@ -1,5 +1,3 @@
-import logging
-
 from crowdstrike.foundry.function.config_loader import ConfigLoaderBase
 from crowdstrike.foundry.function.runner import RunnerBase
 
@@ -19,5 +17,5 @@ class StaticConfigLoader(ConfigLoaderBase):
     def __init__(self, config):
         self.config = config
 
-    def load(self, logger: logging.Logger):
+    def load(self):
         return self.config

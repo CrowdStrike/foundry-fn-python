@@ -1,4 +1,3 @@
-import logging
 import signal
 import sys
 from abc import ABC, abstractmethod
@@ -7,11 +6,7 @@ from crowdstrike.foundry.function.router import Router
 
 class RunnerBase(ABC):
     def __init__(self):
-        self.logger = None
         self.router = None
-
-    def bind_logger(self, logger: logging.Logger):
-        self.logger = logger
 
     def bind_router(self, router: Router):
         self.router = router
@@ -35,7 +30,6 @@ class Runner(RunnerBase):
         signal.signal(signal.SIGINT, shutdown)
         signal.signal(signal.SIGTERM, shutdown)
 
-        self._runner.bind_logger(self.logger)
         self._runner.bind_router(self.router)
         return self._runner.run(*args, **kwargs)
 
