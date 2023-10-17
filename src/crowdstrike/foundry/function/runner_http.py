@@ -1,5 +1,4 @@
 import json
-import logging
 import os
 from crowdstrike.foundry.function.context import ctx_request
 from crowdstrike.foundry.function.mapping import canonize_header, dict_to_request, response_to_dict
@@ -20,8 +19,7 @@ class HTTPRunner(RunnerBase):
         self._port = int(os.environ.get('PORT', '8081'))
 
     def run(self):
-        self.logger.info(f'running at port {self._port}')
-        HTTPRequestHandler.bind_logger(self.logger)
+        print(f'running at port {self._port}')
         HTTPRequestHandler.bind_router(self.router)
         HTTPServer(('', self._port), HTTPRequestHandler).serve_forever()
 
@@ -29,10 +27,6 @@ class HTTPRunner(RunnerBase):
 class HTTPRequestHandler(BaseHTTPRequestHandler):
     _logger = None
     _router = None
-
-    @staticmethod
-    def bind_logger(logger: logging.Logger):
-        HTTPRequestHandler._logger = logger
 
     @staticmethod
     def bind_router(router: Router):

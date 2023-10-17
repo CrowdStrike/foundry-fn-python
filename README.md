@@ -24,7 +24,6 @@ Add the SDK to your project by following the [installation](#installation) instr
 then create your `handler.py`:
 
 ```python
-import logging
 from crowdstrike.foundry.function import (
     APIError,
     Request,
@@ -36,7 +35,7 @@ func = Function.instance()  # *** (1) ***
 
 
 @func.handler(method='POST', path='/create')  # *** (2) ***
-def on_create(request: Request, logger: logging.Logger, config: [dict[str, any], None]) -> Response:  # *** (3), (4) ***
+def on_create(request: Request, config: [dict[str, any], None]) -> Response:  # *** (3), (4) ***
     if len(request.body) == 0:
         return Response(
             code=400,
@@ -65,9 +64,9 @@ if __name__ == '__main__':
    At a minimum, the `handler` must have a `method` and a `path`.
    The `method` must be one of `DELETE`, `GET`, `PATCH`, `POST`, and `PUT`.
    The `path` corresponds to the `url` field in the request.
-   The SDK will provide a `logging.Logger` instance and any loaded configuration.
-3. Methods decorated with `@handler` must take arguments in the order of `Request`, `logging.Logger`, and `dict|None`
-   (i.e. the request, the logger, and either the configuration or nothing; see example above),
+   The SDK will provide any loaded configuration as an argument.
+3. Methods decorated with `@handler` must take arguments in the order of `Request` and `dict|None`
+   (i.e. the request and either the configuration or nothing; see example above),
    and must return a `Response`.
 4. `request`: Request payload and metadata. At the time of this writing, the `Request` object consists of:
     1. `body`: The request payload as given in the Function Gateway `body` payload field. Will be deserialized as
@@ -131,7 +130,7 @@ func = Function.instance()
 
 
 @func.handler(...)
-def endpoint(request, logger, config):
+def endpoint(request, config):
     # ... omitting other code ...
     # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     # !!! create a new client instance on each request !!!

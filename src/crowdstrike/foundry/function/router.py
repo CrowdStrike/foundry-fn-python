@@ -16,9 +16,8 @@ class Router:
     Serves to route function requests to the appropriate handler functions.
     """
 
-    def __init__(self, logger, config):
+    def __init__(self, config):
         self._config = config
-        self._logger = logger
         self._routes = {}
 
     def route(self, req: Request) -> Response:
@@ -44,7 +43,7 @@ class Router:
         if r is None:
             raise FDKException(code=METHOD_NOT_ALLOWED, message="Method Not Allowed: {}".format(req_method))
 
-        return r.func(req, self._logger, self._config)
+        return r.func(req, self._config)
 
     def register(self, r: Route):
         """
