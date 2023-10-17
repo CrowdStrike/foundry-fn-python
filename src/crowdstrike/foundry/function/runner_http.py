@@ -29,10 +29,6 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
     _router = None
 
     @staticmethod
-    def bind_logger(logger: logging.Logger):
-        HTTPRequestHandler._logger = logger
-
-    @staticmethod
     def bind_router(router: Router):
         HTTPRequestHandler._router = router
 
