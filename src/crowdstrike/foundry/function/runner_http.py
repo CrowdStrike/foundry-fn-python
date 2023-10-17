@@ -106,7 +106,7 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
         status = resp.code
         if status == 0 and resp.errors is not None and len(resp.errors) > 0:
             for e in resp.errors:
-                if e.code > status:
+                if type(e.code) is int and 100 <= e.code and status < e.code < 600:
                     status = e.code
 
         payload_dict = response_to_dict(resp)

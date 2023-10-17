@@ -100,13 +100,11 @@ class Function:
         self._loader.load()
         return self._runner.run(*args, **kwargs)
 
-    def handler(self, method: str, path: str, provide_logger: bool = True, provide_config: bool = True):
+    def handler(self, method: str, path: str):
         """
         Decorator for handlers.
         :param method: HTTP method or verb to bind to this handler.
         :param path: URL path at which this handler resides.
-        :param provide_config: Whether this handler should receive any loaded configuration.
-        :param provide_logger: Whether this handler should receive a :class:`logging.Logger` instance.
         """
 
         def call(func):
@@ -115,8 +113,6 @@ class Function:
                 func=func,
                 method=method,
                 path=path,
-                provide_logger=provide_logger,
-                provide_config=provide_config,
             ))
 
         return call

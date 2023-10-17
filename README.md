@@ -31,28 +31,25 @@ from crowdstrike.foundry.function import (
     Response,
     Function,
 )
-from typing import Dict
 
 func = Function.instance()  # *** (1) ***
 
 
 @func.handler(method='POST', path='/create')  # *** (2) ***
-def on_create(request: Request, logger: logging.Logger, config: [Dict[str, any], None]) -> Response:  # *** (3), (4) ***
-    # do something
-    body = {
-        'hello': 'world',
-    }
+def on_create(request: Request, logger: logging.Logger, config: [dict[str, any], None]) -> Response:  # *** (3), (4) ***
+    if len(request.body) == 0:
+        return Response(
+            code=400,
+            errors=[APIError(code=400, message='empty body')]
+        )
+
+    #####
+    # do something useful
+    #####
+
     return Response(  # *** (5) ***
-        body=body,
+        body={'hello': 'world'},
         code=200,
-    )
-
-
-@func.handler(method='GET', path='/fetch', provide_logger=False, provide_config=False)
-def on_fetch(request: Request) -> Response:
-    # do something
-    return Response(
-        errors=[APIError(code=404, message='no such resource')],
     )
 
 
@@ -60,18 +57,18 @@ if __name__ == '__main__':
     func.run()  # *** (6) ***
 ```
 
-1. `Function`: The `Function` class wraps the function.
+1. `Function`: The `Function` class wraps the Foundry Function implementation.
    Each `Function` instance consists of a number of handlers, with each handler corresponding to an endpoint.
-   A script should have exactly one `Function`.
-2. `@func.handler`: The `handler` decorator defines a function in your script as an endpoint.
+   Only one `Function` should exist per Python implementation.
+   Multiple `Function`s will result in undefined behavior.
+2. `@func.handler`: The handler decorator defines a Python function/method as an endpoint.
    At a minimum, the `handler` must have a `method` and a `path`.
    The `method` must be one of `DELETE`, `GET`, `PATCH`, `POST`, and `PUT`.
    The `path` corresponds to the `url` field in the request.
-   By default, the SDK will provide a `logging.Logger` and any loaded configuration;
-   these can be toggled off through the use of the `provide_logger` and `provide_config` options.
-3. Functions decorated with `handler` must take arguments in the order of `Request`, `logging.Logger`, and `Dict`
-   and must return a `Response`. If either or both of `provide_logger` or `provide_config` is False, the corresponding
-   argument should be omitted from the function signature.
+   The SDK will provide a `logging.Logger` instance and any loaded configuration.
+3. Methods decorated with `@handler` must take arguments in the order of `Request`, `logging.Logger`, and `dict|None`
+   (i.e. the request, the logger, and either the configuration or nothing; see example above),
+   and must return a `Response`.
 4. `request`: Request payload and metadata. At the time of this writing, the `Request` object consists of:
     1. `body`: The request payload as given in the Function Gateway `body` payload field. Will be deserialized as
        a `dict[str, Any]`.
@@ -84,8 +81,10 @@ if __name__ == '__main__':
    `code` (an `int` representing an HTTP status code),
    `errors` (a list of any `APIError`s), and `header` (a `dict[str, list[str]]` of any special HTTP headers which
    should be present on the response).
+   If no `code` is provided but a list of `errors` is, the `code` will be derived from the greatest positive valid HTTP
+   code present on the given `APIError`s.
 6. `func.run()`: Runner method and general starting point of execution.
-   Calling `run()` causes the application to be initialized and start executing.
+   Calling `run()` causes the `Function` to finish initializing and start executing.
    Any code declared following this method may not necessarily be executed.
    As such, it is recommended to place this as the last line of your script.
 

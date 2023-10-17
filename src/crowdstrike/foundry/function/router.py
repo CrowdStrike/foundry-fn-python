@@ -9,8 +9,6 @@ class Route:
     func: Callable
     method: str
     path: str
-    provide_config: bool
-    provide_logger: bool
 
 
 class Router:
@@ -46,12 +44,7 @@ class Router:
         if r is None:
             raise FDKException(code=METHOD_NOT_ALLOWED, message="Method Not Allowed: {}".format(req_method))
 
-        args = [req]
-        if r.provide_config:
-            args.append(self._config)
-        if r.provide_logger:
-            args.append(self._logger)
-        return r.func(*args)
+        return r.func(req, self._logger, self._config)
 
     def register(self, r: Route):
         """

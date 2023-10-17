@@ -10,7 +10,7 @@ if __name__ == '__main__':
 logger = new_logger()
 
 
-def do_request_config_logger(req, config, l):
+def do_request(req, l, config):
     return Response(
         body={
             'config': config,
@@ -21,71 +21,15 @@ def do_request_config_logger(req, config, l):
     )
 
 
-def do_request_config(req, config):
-    return Response(
-        body={
-            'config': config,
-            'req': req.body,
-            'has_logger': False,
-        },
-        code=200,
-    )
-
-
-def do_request_logger(req, l):
-    return Response(
-        body={
-            'config': None,
-            'req': req.body,
-            'has_logger': l is not None,
-        },
-        code=200,
-    )
-
-
-def do_request(req):
-    return Response(
-        body={
-            'config': None,
-            'req': req.body,
-            'has_logger': False,
-        },
-        code=200,
-    )
-
-
-class TestRequestResponse(TestCase):
+class TestRequestLifecycle(TestCase):
 
     def setUp(self):
         config = {'a': 'b'}
         router = Router(logger, config)
         router.register(Route(
-            method='GET',
-            path='/only_request',
-            func=do_request,
-            provide_config=False,
-            provide_logger=False,
-        ))
-        router.register(Route(
             method='POST',
-            path='/request_and_logger',
-            func=do_request_logger,
-            provide_config=False,
-            provide_logger=True,
-        ))
-        router.register(Route(
-            method='PUT',
-            path='/request_and_config',
-            func=do_request_config,
-            provide_config=True,
-            provide_logger=False,
-        ))
-        router.register(Route(
-            method='DELETE',
-            path='/request_and_config_and_logger',
-            func=do_request_config_logger,
-            provide_config=True,
-            provide_logger=True,
+            path='/request',
+            func=do_request,
         ))
         self.runner = CapturingRunner()
         self.runner.bind_router(router)
@@ -96,59 +40,11 @@ class TestRequestResponse(TestCase):
             runner=self.runner,
         )
 
-    def test_only_request(self):
-        req = Request(
-            body={'hello': 'world'},
-            method='GET',
-            url='/only_request',
-        )
-        self.function.run(req)
-        resp = self.runner.response
-        self.assertIsNotNone(resp, 'response is none')
-        self.assertEqual(200, resp.code, f'expected response of 200 but got {resp.code}')
-        self.assertDictEqual(
-            {'config': None, 'req': {'hello': 'world'}, 'has_logger': False},
-            resp.body,
-            'actual body differs from expected body'
-        )
-
-    def test_request_logger(self):
+    def test_request(self):
         req = Request(
             body={'hello': 'world'},
             method='POST',
-            url='/request_and_logger',
-        )
-        self.function.run(req)
-        resp = self.runner.response
-        self.assertIsNotNone(resp, 'response is none')
-        self.assertEqual(200, resp.code, f'expected response of 200 but got {resp.code}')
-        self.assertDictEqual(
-            {'config': None, 'req': {'hello': 'world'}, 'has_logger': True},
-            resp.body,
-            'actual body differs from expected body'
-        )
-
-    def test_request_config(self):
-        req = Request(
-            body={'hello': 'world'},
-            method='PUT',
-            url='/request_and_config',
-        )
-        self.function.run(req)
-        resp = self.runner.response
-        self.assertIsNotNone(resp, 'response is none')
-        self.assertEqual(200, resp.code, f'expected response of 200 but got {resp.code}')
-        self.assertDictEqual(
-            {'config': {'a': 'b'}, 'req': {'hello': 'world'}, 'has_logger': False},
-            resp.body,
-            'actual body differs from expected body'
-        )
-
-    def test_request_config_logger(self):
-        req = Request(
-            body={'hello': 'world'},
-            method='DELETE',
-            url='/request_and_config_and_logger',
+            url='/request',
         )
         self.function.run(req)
         resp = self.runner.response
@@ -174,6 +70,6 @@ class TestRequestResponse(TestCase):
             req = Request(
                 body={'hello': 'world'},
                 method='GET',
-                url='/request_and_config_and_logger',
+                url='/request',
             )
             self.function.run(req)
