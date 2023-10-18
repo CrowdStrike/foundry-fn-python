@@ -25,7 +25,6 @@ class HTTPRunner(RunnerBase):
 
 
 class HTTPRequestHandler(BaseHTTPRequestHandler):
-    _logger = None
     _router = None
 
     @staticmethod
@@ -75,7 +74,7 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
         self._exec_request()
 
     def _exec_request(self):
-        HTTPRequestHandler._logger.info('received request')
+        print('received request')
         req = self._read_request()
         ctx_request.set(req)
         try:
@@ -97,20 +96,23 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
             msg = f'Object is not of type {Response.__base__.__name__}. Got {type(resp)} instead.'
             resp = Response(errors=[APIError(code=INTERNAL_SERVER_ERROR, message=msg)])
 
-        status = resp.code
-        if status == 0 and resp.errors is not None and len(resp.errors) > 0:
+        if resp.code == 0 and resp.errors is not None and len(resp.errors) > 0:
             for e in resp.errors:
-                if type(e.code) is int and 100 <= e.code and status < e.code < 600:
-                    status = e.code
+                e_code = e.code
+                if type(e_code) is not int and e_code is not None:
+                    e_code = int(e_code)
+                if type(e_code) is int and 100 <= e.code and resp.code < e.code < 600:
+                    resp.code = e_code
 
+        resp.header = self._resp_headers(req, resp)
         payload_dict = response_to_dict(resp)
         payload = json.dumps(payload_dict)
 
-        self.send_response(status)
+        self.send_response(resp.code)
         self.send_header('Content-Length', str(len(payload)))
         self.send_header('Content-Type', 'application/json')
-        for k, v in self._resp_headers(req, resp).items():
-            self.send_header(k, ';'.join(v))
+        for k, v in resp.header.items():
+            self.send_header(k, v)
         self.end_headers()
         self.wfile.write(payload.encode('utf-8'))
 
@@ -129,6 +131,8 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
         self._take_header('X-Cs-Executionid', req_header, headers)
         self._take_header('X-Cs-Origin', req_header, headers)
         self._take_header('X-Cs-Traceid', req_header, headers)
+
+        headers = {k: ';'.join(v) for k, v in headers}
         return headers
 
     def _take_header(self, key: str, src_header: dict[str, list[str]], dst_header: dict[str, list[str]]):
