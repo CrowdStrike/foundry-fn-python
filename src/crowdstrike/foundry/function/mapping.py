@@ -9,18 +9,24 @@ def response_to_dict(r: Response) -> Dict:
     :param r: :class:`Response` instance to convert.
     :return: Dictionary version of the provided instance.
     """
-    errors = []
     body = r.body
+    errors = []
+    header = {}
 
     if r.errors is not None:
         for e in r.errors:
             errors.append({'code': e.code, 'message': e.message})
+    if r.header is not None:
+        header = r.header
 
-    d = {}
+    d = {'code': r.code}
     if body is not None:
         d['body'] = body
     if len(errors) > 0:
         d['errors'] = errors
+    if len(header) > 0:
+        d['header'] = header
+
     return d
 
 

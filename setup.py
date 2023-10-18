@@ -16,7 +16,7 @@ PYTHON_VERSION = '>=3.9.0'
 SETUP_REQUIRES = [
     'setuptools',
 ]
-VERSION = '0.5.1'
+VERSION = '0.5.2'
 
 
 def main():
