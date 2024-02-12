@@ -12,11 +12,11 @@ PACKAGE_DIR = {
 PACKAGES = [
     'crowdstrike.foundry.function',
 ]
-PYTHON_VERSION = '>=3.9.0'
+PYTHON_VERSION = '>=3.8.0'
 SETUP_REQUIRES = [
     'setuptools',
 ]
-VERSION = '0.5.3'
+VERSION = '0.6.0'
 
 
 def main():
