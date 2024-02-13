@@ -18,8 +18,8 @@ Unit testing is performed with every pull request or commit to `main`.
 
 | Version |                    Supported                    |
 |:--------|:-----------------------------------------------:|
-| \>= 3.9 | ![Yes](https://img.shields.io/badge/-YES-green) |
-| <= 3.8  |   ![No](https://img.shields.io/badge/-NO-red)   |
+| \>= 3.8 | ![Yes](https://img.shields.io/badge/-YES-green) |
+| <= 3.7  |   ![No](https://img.shields.io/badge/-NO-red)   |
 
 ## Supported CrowdStrike regions
 
