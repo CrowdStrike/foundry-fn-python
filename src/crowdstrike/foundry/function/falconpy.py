@@ -29,5 +29,9 @@ def falcon_client(client_class: Type) -> ServiceClass:
     cloud = cloud.lower().replace('-', '').strip()
     if cloud == '':
         cloud = _cloud_default
+
+    # set cloud on the request object that is in the context
+    req.cloud = cloud
+
     client = client_class(access_token=access_token, base_url=cloud)
     return client
