@@ -2,8 +2,8 @@ import os
 import unittest
 from unittest.mock import patch
 from crowdstrike.foundry.function.context import ctx_request
-from crowdstrike.foundry.function.falconpy import  falcon_client
-from crowdstrike.foundry.function.model import  Request
+from crowdstrike.foundry.function.falconpy import falcon_client
+from crowdstrike.foundry.function.model import Request
 from falconpy import Hosts
 
 if __name__ == '__main__':
@@ -54,3 +54,14 @@ class TestFalconClient(unittest.TestCase):
             self.assertIsInstance(client, Hosts)
             self.assertEqual('Bearer foo', client.headers.get('Authorization'))
             self.assertEqual(t['expected'], client.base_url)
+
+    def test_request_inserts_cloud_into_request(self):
+        with patch.dict(os.environ, {'CS_CLOUD': 'us-gov-1'}, clear=True):
+            ctx_request.set(Request(access_token='foo'))
+            client = falcon_client(Hosts)
+
+            self.assertIsInstance(client, Hosts)
+            self.assertEqual('Bearer foo', client.headers.get('Authorization'))
+            self.assertEqual('https://api.laggar.gcw.crowdstrike.com', client.base_url)
+            r = ctx_request.get()
+            self.assertEqual('usgov1', r.cloud)
