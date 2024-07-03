@@ -22,6 +22,7 @@ class Request:
     method: str = field(default='')
     params: RequestParams = field(default_factory=lambda: RequestParams())
     url: str = field(default='')
+    cloud: str = field(default='')
 
 
 @dataclass
