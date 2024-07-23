@@ -110,21 +110,18 @@ curl -X POST 'http://localhost:8081' \
 }'
 ```
 
-## Convenience Functionality 🧰
+## Working with `falconpy`
 
-### `falconpy`
+Function authors should import `falconpy` explicitly as a requirement in their project when needed.
 
-Foundry Function Python ships with [falconpy](https://github.com/CrowdStrike/falconpy) pre-integrated and a convenience
-constructor.
-While it is not strictly necessary to use the convenience function, it is recommended.
+### General usage
 
 **Important:** Create a new instance of each `falconpy` client you want on each request.
 
 ```python
 # omitting other imports
 from falconpy.alerts import Alerts
-from falconpy.event_streams import EventStreams
-from crowdstrike.foundry.function import falcon_client, Function
+from crowdstrike.foundry.function import cloud, Function
 
 func = Function.instance()
 
@@ -136,8 +133,7 @@ def endpoint(request, config):
     # !!! create a new client instance on each request !!!
     # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-    alerts_client = falcon_client(Alerts)
-    event_streams_client = falcon_client(EventStreams)
+    falconpy_alerts = Alerts(access_token=request.access_token, base_url=cloud())
 
     # ... omitting other code ...
 ```

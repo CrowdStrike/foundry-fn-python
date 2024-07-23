@@ -1,7 +1,9 @@
-from crowdstrike.foundry.function import Function, Request, Response, FDKException
+import os
+from crowdstrike.foundry.function import Function, Request, Response, FDKException, cloud
 from crowdstrike.foundry.function.router import Route, Router
 from tests.crowdstrike.foundry.function.utils import CapturingRunner, StaticConfigLoader
 from unittest import main, TestCase
+from unittest.mock import patch
 
 if __name__ == '__main__':
     main()
@@ -68,3 +70,16 @@ class TestRequestLifecycle(TestCase):
                 url='/request',
             )
             self.function.run(req)
+
+
+class TestCloud(TestCase):
+
+    def test_cloud_returns_default_if_none_specified(self):
+        with patch.dict(os.environ, {}, clear=True):
+            c = cloud()
+            self.assertEqual("auto", c)
+
+    def test_cloud_returns_cloud_in_env(self):
+        with patch.dict(os.environ, {'CS_CLOUD': 'us-gov-1'}, clear=True):
+            c = cloud()
+            self.assertEqual("usgov1", c)
