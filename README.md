@@ -112,8 +112,6 @@ curl -X POST 'http://localhost:8081' \
 
 ## Working with `falconpy`
 
-As of version 1.0.0, `falconpy` no longer ships with Foundry Function Python.
-Removal of this dependency is intended to reduce the maintenance of this project.
 Function authors should import `falconpy` explicitly as a requirement in their project when needed.
 
 ### General usage
