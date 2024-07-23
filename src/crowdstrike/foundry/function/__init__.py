@@ -1,4 +1,3 @@
-from crowdstrike.foundry.function.falconpy import falcon_client
 from crowdstrike.foundry.function.model import *
 
 
@@ -106,3 +105,19 @@ class Function:
             ))
 
         return call
+
+
+def cloud() -> str:
+    """
+    Retrieves a FalconPy-compatible identifier which identifies the cloud in which this function is running.
+    :return: Cloud in which this function is executing.
+    """
+    import os
+
+    _default = 'auto'
+    c = os.environ.get('CS_CLOUD', _default)
+    c = c.lower().replace('-', '').strip()
+    if c == '':
+        c = _default
+
+    return c
