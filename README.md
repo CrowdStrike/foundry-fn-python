@@ -24,6 +24,7 @@ Add the SDK to your project by following the [installation](#installation) instr
 then create your `handler.py`:
 
 ```python
+import logging
 from crowdstrike.foundry.function import (
     APIError,
     Request,
@@ -35,7 +36,8 @@ func = Function.instance()  # *** (1) ***
 
 
 @func.handler(method='POST', path='/create')  # *** (2) ***
-def on_create(request: Request, config: [dict[str, any], None]) -> Response:  # *** (3), (4) ***
+def on_create(request: Request, config: [dict[str, any], None],
+              logger: logging.Logger) -> Response:  # *** (3), (4), (5) ***
     if len(request.body) == 0:
         return Response(
             code=400,
@@ -46,14 +48,30 @@ def on_create(request: Request, config: [dict[str, any], None]) -> Response:  # 
     # do something useful
     #####
 
-    return Response(  # *** (5) ***
+    return Response(  # *** (6) ***
         body={'hello': 'world'},
         code=200,
     )
 
 
+@func.handler(method='PUT', path='/update')
+def on_update(request: Request) -> Response:  # *** (7) ***
+    # do stuff
+    return Response(
+        # ...snip...
+    )
+
+
+@func.handler(method='DELETE', path='/foo')
+def on_delete(request: Request, config: [dict[str, any], None]) -> Response:  # *** (8) ***
+    # do stuff
+    return Response(
+        # ...snip...
+    )
+
+
 if __name__ == '__main__':
-    func.run()  # *** (6) ***
+    func.run()  # *** (9) ***
 ```
 
 1. `Function`: The `Function` class wraps the Foundry Function implementation.
@@ -75,14 +93,22 @@ if __name__ == '__main__':
     3. `url`: The request path relative to the function as a string.
     4. `method`: The request HTTP method or verb.
     5. `access_token`: Caller-supplied access token.
-5. Return from a `@handler` function: Returns a `Response` object.
+5. `logger`: Unless there is specific reason not to, the function author should use the `Logger` provided to the
+   function.
+   When deployed, the supplied `Logger` will be formatted in a custom manner and will have fields injected to assist
+   with working against our internal logging infrastructure.
+   Failure to use the provided `Logger` can thus make triage more difficult.
+6. Return from a `@handler` function: Returns a `Response` object.
    The `Response` object contains fields `body` (payload of the response as a `dict`),
    `code` (an `int` representing an HTTP status code),
    `errors` (a list of any `APIError`s), and `header` (a `dict[str, list[str]]` of any special HTTP headers which
    should be present on the response).
    If no `code` is provided but a list of `errors` is, the `code` will be derived from the greatest positive valid HTTP
    code present on the given `APIError`s.
-6. `func.run()`: Runner method and general starting point of execution.
+7. `on_update(request: Request)`: If only one argument is provided, only a `Request` will be provided.
+8. `on_delete(request: Request, config: [dict[str, any], None])`: If two arguments are provided, a `Request` and config
+   will be provided.
+9. `func.run()`: Runner method and general starting point of execution.
    Calling `run()` causes the `Function` to finish initializing and start executing.
    Any code declared following this method may not necessarily be executed.
    As such, it is recommended to place this as the last line of your script.
@@ -110,21 +136,18 @@ curl -X POST 'http://localhost:8081' \
 }'
 ```
 
-## Convenience Functionality 🧰
+## Working with `falconpy`
 
-### `falconpy`
+Function authors should import `falconpy` explicitly as a requirement in their project when needed.
 
-Foundry Function Python ships with [falconpy](https://github.com/CrowdStrike/falconpy) pre-integrated and a convenience
-constructor.
-While it is not strictly necessary to use the convenience function, it is recommended.
+### General usage
 
 **Important:** Create a new instance of each `falconpy` client you want on each request.
 
 ```python
 # omitting other imports
 from falconpy.alerts import Alerts
-from falconpy.event_streams import EventStreams
-from crowdstrike.foundry.function import falcon_client, Function
+from crowdstrike.foundry.function import cloud, Function
 
 func = Function.instance()
 
@@ -136,8 +159,7 @@ def endpoint(request, config):
     # !!! create a new client instance on each request !!!
     # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-    alerts_client = falcon_client(Alerts)
-    event_streams_client = falcon_client(EventStreams)
+    falconpy_alerts = Alerts(access_token=request.access_token, base_url=cloud())
 
     # ... omitting other code ...
 ```

@@ -1,6 +1,8 @@
 from crowdstrike.foundry.function.model import FDKException, Request, Response
 from dataclasses import dataclass
 from http.client import BAD_REQUEST, METHOD_NOT_ALLOWED, NOT_FOUND, SERVICE_UNAVAILABLE
+from inspect import signature
+from logging import Logger
 from typing import Callable
 
 
@@ -16,8 +18,9 @@ class Router:
     Serves to route function requests to the appropriate handler functions.
     """
 
-    def __init__(self, config):
+    def __init__(self, config, logger: [Logger, None] = None):
         self._config = config
+        self._logger = logger
         self._routes = {}
 
     def route(self, req: Request) -> Response:
@@ -35,15 +38,26 @@ class Router:
                                message="Unsupported method format, expects string: {}".format(req.method))
 
         methods_for_url = self._routes.get(req.url, None)
-        if methods_for_url is None:
-            raise FDKException(code=NOT_FOUND, message="Not Found: {}".format(req.url))
-
         req_method = req.method.strip().upper()
+        if methods_for_url is None:
+            raise FDKException(code=NOT_FOUND, message="Not Found: {} {}".format(req_method, req.url))
+
         r = methods_for_url.get(req_method, None)
         if r is None:
-            raise FDKException(code=METHOD_NOT_ALLOWED, message="Method Not Allowed: {}".format(req_method))
+            raise FDKException(code=METHOD_NOT_ALLOWED, message="Method Not Allowed: {} at endpoint".format(req_method))
 
-        return r.func(req, self._config)
+        return self._call_route(r, req)
+
+    def _call_route(self, route: Route, req: Request):
+        f = route.func
+        len_params = len(signature(f).parameters)
+
+        # We'll make this more flexible in the future if needed.
+        if len_params == 3:
+            return f(req, self._config, self._logger)
+        if len_params == 2:
+            return f(req, self._config)
+        return f(req)
 
     def register(self, r: Route):
         """
