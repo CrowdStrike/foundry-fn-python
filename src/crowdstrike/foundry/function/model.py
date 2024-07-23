@@ -18,11 +18,13 @@ class APIError:
 class Request:
     access_token: str = field(default='')
     body: Dict[str, any] = field(default_factory=lambda: {})
+    cloud: str = field(default='')
     context: Dict[str, any] = field(default_factory=lambda: {})
+    fn_id: str = field(default='')
+    fn_version: int = field(default=0)
     method: str = field(default='')
     params: RequestParams = field(default_factory=lambda: RequestParams())
     url: str = field(default='')
-    cloud: str = field(default='')
 
 
 @dataclass

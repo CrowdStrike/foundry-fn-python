@@ -21,6 +21,8 @@ class TestRequest(unittest.TestCase):
             context={
                 'goodnight': 'moon',
             },
+            fn_id='d31cd12d3e29422484a0d1ba0ac60e79',
+            fn_version=123,
             method='GET',
             params=RequestParams(
                 header={
@@ -42,6 +44,8 @@ class TestRequest(unittest.TestCase):
             'context': {
                 'goodnight': 'moon',
             },
+            'fn_id': 'd31cd12d3e29422484a0d1ba0ac60e79',
+            'fn_version': 123,
             'method': 'GET',
             'params': {
                 'header': {
