@@ -1,5 +1,18 @@
-from crowdstrike.foundry.function.falconpy import falcon_client
 from crowdstrike.foundry.function.model import *
+import sys
+import logging
+
+
+def _new_http_logger() -> logging.Logger:
+    f = logging.Formatter('%(asctime)s [%(levelname)s]  %(filename)s %(funcName)s:%(lineno)d  ->  %(message)s')
+
+    h = logging.StreamHandler(sys.stdout)
+    h.setFormatter(f)
+
+    l = logging.getLogger("cs-logger")
+    l.setLevel('DEBUG')
+    l.addHandler(h)
+    return l
 
 
 class Function:
@@ -17,6 +30,7 @@ class Function:
             loader=None,
             router=None,
             runner=None,
+            logger=None,
     ) -> 'Function':
         """
         Fetch the singleton instance of the :class:`Function`, creating one if one does not yet exist.
@@ -26,6 +40,8 @@ class Function:
         :param loader: :class:`Loader` instance.
         :param router: :class:`Router` instance.
         :param runner: :class:`RunnerBase` instance.
+        :param logger: :class:`Logger` instance. Note: A CrowdStrike-specific logging instance will be provided
+        internally.
         :returns: :class:`Function` singleton.
         """
         if Function._instance is None:
@@ -34,6 +50,7 @@ class Function:
                 config=config,
                 config_loader=config_loader,
                 loader=loader,
+                logger=logger,
                 router=router,
                 runner=runner,
             )
@@ -45,6 +62,7 @@ class Function:
             config=None,
             config_loader=None,
             loader=None,
+            logger=None,
             router=None,
             runner=None,
     ):
@@ -53,6 +71,8 @@ class Function:
         :param config: Configuration to provide to the user's code.
         :param config_loader: :class:`ConfigLoaderBase` instance capable of loading configuration if `config` is None.
         :param loader: :class:`Loader` instance.
+        :param logger: :class:`logging.Logger` instance. Note: A CrowdStrike-specific logging instance will be provided
+        internally.
         :param router: :class:`Router` instance.
         :param runner: :class:`RunnerBase` instance.
         """
@@ -61,6 +81,8 @@ class Function:
         self._router = router
         self._runner = runner
 
+        if logger is None:
+            logger = _new_http_logger()
         if self._config is None:
             if config_loader is None:
                 from crowdstrike.foundry.function.config_loader import ConfigLoader
@@ -72,7 +94,7 @@ class Function:
             self._loader = Loader()
         if self._router is None:
             from crowdstrike.foundry.function.router import Router
-            self._router = Router(self._config)
+            self._router = Router(self._config, logger=logger)
         if self._runner is None:
             from crowdstrike.foundry.function.runner import Runner
             from crowdstrike.foundry.function.runner_http import HTTPRunner
@@ -106,3 +128,19 @@ class Function:
             ))
 
         return call
+
+
+def cloud() -> str:
+    """
+    Retrieves a FalconPy-compatible identifier which identifies the cloud in which this function is running.
+    :return: Cloud in which this function is executing.
+    """
+    import os
+
+    _default = 'auto'
+    c = os.environ.get('CS_CLOUD', _default)
+    c = c.lower().replace('-', '').strip()
+    if c == '':
+        c = _default
+
+    return c
