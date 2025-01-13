@@ -19,7 +19,7 @@ authors:
     affiliation: CrowdStrike
 repository-code: 'https://github.com/CrowdStrike/foundry-fn-python'
 url: 'https://www.crowdstrike.com'
-repository-artifact: 'https://pypi.org/project/crowdstrike-foundry/'
+repository-artifact: 'https://pypi.org/project/crowdstrike-foundry-function/'
 abstract: >-
   The CrowdStrike Foundry Function as a Service SDK
   is a community-driven, open source project designed
