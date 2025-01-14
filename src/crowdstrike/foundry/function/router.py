@@ -18,15 +18,16 @@ class Router:
     Serves to route function requests to the appropriate handler functions.
     """
 
-    def __init__(self, config, logger: [Logger, None] = None):
+    def __init__(self, config):
         self._config = config
-        self._logger = logger
         self._routes = {}
 
-    def route(self, req: Request) -> Response:
+    def route(self, req: Request, logger: [Logger, None] = None) -> Response:
         """
         Given the method and path of a :class:`Request`, invokes the corresponding handler if one exists.
         :param req: :class:`Request` presented to the function.
+        :param logger: :class:`Logger` instance. Note: A CrowdStrike-specific logging instance will be provided
+        internally.
         :return: :class:`Response` from the handler.
         :raise FDKException: Path-method mismatch.
         """
@@ -46,15 +47,15 @@ class Router:
         if r is None:
             raise FDKException(code=METHOD_NOT_ALLOWED, message="Method Not Allowed: {} at endpoint".format(req_method))
 
-        return self._call_route(r, req)
+        return self._call_route(r, req, logger)
 
-    def _call_route(self, route: Route, req: Request):
+    def _call_route(self, route: Route, req: Request, logger: [Logger, None] = None):
         f = route.func
         len_params = len(signature(f).parameters)
 
         # We'll make this more flexible in the future if needed.
         if len_params == 3:
-            return f(req, self._config, self._logger)
+            return f(req, self._config, logger)
         if len_params == 2:
             return f(req, self._config)
         return f(req)
