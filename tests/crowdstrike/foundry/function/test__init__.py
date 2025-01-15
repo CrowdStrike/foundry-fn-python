@@ -1,7 +1,7 @@
 import os
 from crowdstrike.foundry.function import Function, Request, Response, FDKException, cloud
 from crowdstrike.foundry.function.router import Route, Router
-from logging import Logger
+from logging import Logger, getLogger
 from tests.crowdstrike.foundry.function.utils import CapturingRunner, StaticConfigLoader
 from unittest import main, TestCase
 from unittest.mock import patch
@@ -41,11 +41,9 @@ def do_request3(req, config, logger):
 
 
 class TestRequestLifecycle(TestCase):
-    logger = Logger(__name__)
-
     def setUp(self):
         config = {'a': 'b'}
-        router = Router(config, self.logger)
+        router = Router(config)
         router.register(Route(
             method='POST',
             path='/request1',
@@ -107,14 +105,17 @@ class TestRequestLifecycle(TestCase):
             method='POST',
             url='/request3',
         )
-        self.function.run(req)
+        use_logger = getLogger('__name__')
+        self.function.run(req, logger=use_logger)
         resp = self.runner.response
         self.assertIsNotNone(resp, 'response is none')
         self.assertEqual(200, resp.code, f'expected response of 200 but got {resp.code}')
+        l = resp.body.get('logger', None)
+        self.assertIsInstance(l, Logger,'no logger present in response')
         self.assertDictEqual(
             {
                 'config': {'a': 'b'},
-                'logger': self.logger,
+                'logger': l,
                 'req': {'hello': 'world'},
             },
             resp.body,

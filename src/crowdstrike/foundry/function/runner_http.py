@@ -7,6 +7,20 @@ from crowdstrike.foundry.function.router import Router
 from crowdstrike.foundry.function.runner import RunnerBase
 from http.client import INTERNAL_SERVER_ERROR
 from http.server import BaseHTTPRequestHandler, HTTPServer
+from logging import Formatter, Logger, StreamHandler, getLogger
+from sys import stdout
+
+
+def _new_http_logger() -> Logger:
+    f = Formatter('%(asctime)s [%(levelname)s]  %(filename)s %(funcName)s:%(lineno)d  ->  %(message)s')
+
+    h = StreamHandler(stdout)
+    h.setFormatter(f)
+
+    l = getLogger("cs-logger")
+    l.setLevel('DEBUG')
+    l.addHandler(h)
+    return l
 
 
 class HTTPRunner(RunnerBase):
@@ -18,14 +32,24 @@ class HTTPRunner(RunnerBase):
         RunnerBase.__init__(self)
         self._port = int(os.environ.get('PORT', '8081'))
 
-    def run(self):
-        print(f'running at port {self._port}')
+    def run(self, *args, **kwargs):
+        logger = kwargs.get('logger', None)
+        if logger is None:
+            logger = _new_http_logger()
+        HTTPRequestHandler.bind_logger(logger)
+
         HTTPRequestHandler.bind_router(self.router)
+        logger.info(f'running at port {self._port}')
         HTTPServer(('', self._port), HTTPRequestHandler).serve_forever()
 
 
 class HTTPRequestHandler(BaseHTTPRequestHandler):
+    _logger = None
     _router = None
+
+    @staticmethod
+    def bind_logger(logger: Logger):
+        HTTPRequestHandler._logger = logger
 
     @staticmethod
     def bind_router(router: Router):
@@ -74,11 +98,11 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
         self._exec_request()
 
     def _exec_request(self):
-        print('received request')
+        HTTPRequestHandler._logger.info('received request')
         req = self._read_request()
         ctx_request.set(req)
         try:
-            resp = HTTPRequestHandler._router.route(req)
+            resp = HTTPRequestHandler._router.route(req, logger=HTTPRequestHandler._logger)
         except FDKException as fe:
             resp = Response(errors=[APIError(code=fe.code, message=fe.message)])
         self._write_response(req, resp)
