@@ -19,6 +19,7 @@ class Request:
     access_token: str = field(default='')
     body: Dict[str, any] = field(default_factory=lambda: {})
     context: Dict[str, any] = field(default_factory=lambda: {})
+    files: Dict[str, bytes] = field(default_factory=lambda: {})
     fn_id: str = field(default='')
     fn_version: int = field(default=0)
     method: str = field(default='')

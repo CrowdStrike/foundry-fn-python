@@ -1,5 +1,6 @@
 import json
 import os
+import python_multipart
 from crowdstrike.foundry.function.context import ctx_request
 from crowdstrike.foundry.function.mapping import canonize_header, dict_to_request, response_to_dict
 from crowdstrike.foundry.function.model import APIError, FDKException, Request, Response
@@ -108,12 +109,48 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
         self._write_response(req, resp)
 
     def _read_request(self) -> Request:
+        content_type = self.headers.get('Content-Type', 'application/json')
+        if not self.rfile.closed:
+            if content_type.startswith('multipart/form-data'):
+                payload = self._read_multipart_request()
+            else:
+                payload = self._read_json_request()
+            return dict_to_request(payload)
+        return dict_to_request('')
+
+    def _read_json_request(self) -> dict:
         content_len = int(self.headers.get('Content-Length', 0))
-        payload = '{}'
-        if content_len > 0 and not self.rfile.closed:
-            payload = self.rfile.read(content_len).decode('utf-8').strip()
+        payload = self.rfile.read(content_len).decode('utf-8').strip()
         payload = json.loads(payload)
-        return dict_to_request(payload)
+        return payload
+
+    def _read_multipart_request(self) -> dict:
+        body = {}
+        files = {}
+        req = {}
+
+        def on_field(field):
+            nonlocal body, req
+            fname = field.field_name.decode('utf-8').strip()
+            if fname == 'meta':
+                value = field.value
+                req = json.loads(value.decode('utf-8').strip())
+            elif fname == 'body':
+                value = field.value
+                body = json.loads(value.decode('utf-8').strip())
+
+        def on_file(file):
+            nonlocal files
+            # Offset will currently be at the end of the buffer.
+            # Need to reset it to the beginning so we can read it.
+            file.file_object.seek(0)
+            files[file.file_name.decode('utf-8')] = file.file_object.read(-1)
+
+        python_multipart.parse_form(self.headers, self.rfile, on_field=on_field, on_file=on_file)
+
+        req['body'] = body
+        req['files'] = files
+        return req
 
     def _write_response(self, req: Request, resp: [Response, None]):
         if resp is None or not isinstance(resp, Response):
