@@ -1,8 +1,12 @@
-![CrowdStrike Falcon](/docs/asset/cs-logo.png?raw=true)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/CrowdStrike/falconpy/main/docs/asset/cs-logo-red.png">
+  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/CrowdStrike/falconpy/main/docs/asset/cs-logo.png">
+  <img alt="CrowdStrike Logo." src="https://raw.githubusercontent.com/CrowdStrike/falconpy/main/docs/asset/cs-logo-red.png">
+</picture>
 
 # Repository Support
 
-`foundry-fn-python` is a community-driven, open source project designed to assist developers in leveraging the power of CrowdStrike APIs within their solutions. While not a formal CrowdStrike product, `foundry-fn-python` is maintained by CrowdStrike and supported in partnership with the open source developer community.
+`foundry-fn-python` is a community-driven, open source project designed to assist developers in leveraging the power of CrowdStrike APIs within their solutions. While not a formal CrowdStrike product, `foundry-fn-python` repo and the `crowdstrike-foundry-function` FDK package are maintained by CrowdStrike and supported in partnership with the open source developer community.
 
 ## Issue Reporting and Questions 🐛
 

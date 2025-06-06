@@ -1,4 +1,8 @@
-![CrowdStrike Falcon](/docs/asset/cs-logo.png?raw=true)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/CrowdStrike/falconpy/main/docs/asset/cs-logo-red.png">
+  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/CrowdStrike/falconpy/main/docs/asset/cs-logo.png">
+  <img alt="CrowdStrike Logo." src="https://raw.githubusercontent.com/CrowdStrike/falconpy/main/docs/asset/cs-logo-red.png">
+</picture>
 
 # Security Policy
 
@@ -7,7 +11,7 @@ This document outlines security policy and procedures for the CrowdStrike `found
 + [Supported Python versions](#supported-python-versions)
 + [Supported Operating Systems](#supported-operating-systems)
 + [Supported CrowdStrike regions](#supported-crowdstrike-regions)
-+ [Supported foundry-fn-python versions](#supported-foundry-fn-python-versions)
++ [Supported crowdStrike-foundry-function versions](#supported-crowdstrike-foundry-function-versions)
 + [Reporting a potential security vulnerability](#reporting-a-potential-security-vulnerability)
 + [Disclosure and Mitigation Process](#disclosure-and-mitigation-process)
 
@@ -31,7 +35,7 @@ foundry-fn-python is unit tested for functionality across all commercial CrowdSt
 | US-2   |
 | EU-1   |
 
-## Supported foundry-fn-python versions
+## Supported crowdstrike-foundry-function versions
 
 When discovered, we release security vulnerability patches for the most recent release at an accelerated cadence.
 

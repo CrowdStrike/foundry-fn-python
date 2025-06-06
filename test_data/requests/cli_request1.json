@@ -1,0 +1,7 @@
+{
+    "method": "POST",
+    "url": "/request1",
+    "body": {
+        "hello": "world"
+    }
+}

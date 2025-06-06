@@ -1,0 +1,17 @@
+{
+    "method": "POST",
+    "url": "/request4",
+    "body": {
+        "hello": "world"
+    },
+    "params": {
+        "query": {
+            "test": [
+                true
+            ],
+            "test2": [
+                "yes"
+            ]
+        }
+    }
+}

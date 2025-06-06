@@ -1,14 +1,19 @@
-from crowdstrike.foundry.function.model import *
+"""CrowdStrike Foundry Functions FDK."""
 import sys
-import logging
+from typing import Union
+from crowdstrike.foundry.function.model import (
+    RequestParams,
+    APIError,
+    Request,
+    Response,
+    FDKException
+)
 
 
 class Function:
-    """
-    Represents a Function.
-    """
+    """Represents a Function."""
 
-    _instance: ['Function', None] = None
+    _instance: Union['Function', None] = None
 
     @staticmethod
     def instance(
@@ -19,8 +24,8 @@ class Function:
             router=None,
             runner=None,
     ) -> 'Function':
-        """
-        Fetch the singleton instance of the :class:`Function`, creating one if one does not yet exist.
+        """Fetch the singleton instance of the :class:`Function`, creating one if one does not yet exist.
+
         :param module: Name of the module in which code should be imported.
         :param config: Configuration to provide to the user's code.
         :param config_loader: :class:`ConfigLoaderBase` instance capable of loading configuration if `config` is None.
@@ -49,7 +54,8 @@ class Function:
             router=None,
             runner=None,
     ):
-        """
+        """Construct an instance of the class.
+
         :param module: Name of the module in which code should be imported.
         :param config: Configuration to provide to the user's code.
         :param config_loader: :class:`ConfigLoaderBase` instance capable of loading configuration if `config` is None.
@@ -76,15 +82,21 @@ class Function:
             self._router = Router(self._config)
         if self._runner is None:
             from crowdstrike.foundry.function.runner import Runner
-            from crowdstrike.foundry.function.runner_http import HTTPRunner
-            self._runner = Runner(HTTPRunner())
+            if len(sys.argv) > 1:
+                # when arguments are provided to the function,
+                # run in CLI mode without starting an http server
+                from crowdstrike.foundry.function.runner_cli import CLIRunner
+                self._runner = Runner(CLIRunner())
+            else:
+                from crowdstrike.foundry.function.runner_http import HTTPRunner
+                self._runner = Runner(HTTPRunner())
             self._runner.bind_router(self._router)
 
         self._loader.register_module(module)
 
     def run(self, *args, **kwargs):
-        """
-        Runs the function. Essentially the "main" method of the function.
+        """Run the function. Essentially the "main" method of the function.
+
         Any arguments provided to this method are forwarded directly down into :class:`RunnerBase` instance.
         :return: Any result from the given :class:`RunnerBase` instance.
         """
@@ -92,8 +104,8 @@ class Function:
         return self._runner.run(*args, **kwargs)
 
     def handler(self, method: str, path: str):
-        """
-        Decorator for handlers.
+        """Define the decorator for handlers.
+
         :param method: HTTP method or verb to bind to this handler.
         :param path: URL path at which this handler resides.
         """
@@ -110,8 +122,8 @@ class Function:
 
 
 def cloud() -> str:
-    """
-    Retrieves a FalconPy-compatible identifier which identifies the cloud in which this function is running.
+    """Retrieve a FalconPy-compatible identifier which identifies the cloud in which this function is running.
+
     :return: Cloud in which this function is executing.
     """
     import os

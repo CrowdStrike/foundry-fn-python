@@ -1,3 +1,4 @@
+"""Request context for CrowdStrike Foundry Functions FDK."""
 from contextvars import ContextVar
 
 # While this holds the inbound handler request, do not access them directly

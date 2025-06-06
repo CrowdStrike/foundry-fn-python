@@ -1,10 +1,10 @@
 import os
-from crowdstrike.foundry.function import Function, Request, Response, FDKException, cloud
-from crowdstrike.foundry.function.router import Route, Router
 from logging import Logger, getLogger
-from tests.crowdstrike.foundry.function.utils import CapturingRunner, StaticConfigLoader
 from unittest import main, TestCase
 from unittest.mock import patch
+from crowdstrike.foundry.function import Function, Request, Response, FDKException, cloud
+from crowdstrike.foundry.function.router import Route, Router
+from tests.crowdstrike.foundry.function.utils import CapturingRunner, StaticConfigLoader
 
 if __name__ == '__main__':
     main()
@@ -110,12 +110,12 @@ class TestRequestLifecycle(TestCase):
         resp = self.runner.response
         self.assertIsNotNone(resp, 'response is none')
         self.assertEqual(200, resp.code, f'expected response of 200 but got {resp.code}')
-        l = resp.body.get('logger', None)
-        self.assertIsInstance(l, Logger,'no logger present in response')
+        logger = resp.body.get('logger', None)
+        self.assertIsInstance(logger, Logger,'no logger present in response')
         self.assertDictEqual(
             {
                 'config': {'a': 'b'},
-                'logger': l,
+                'logger': logger,
                 'req': {'hello': 'world'},
             },
             resp.body,

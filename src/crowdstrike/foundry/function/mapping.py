@@ -1,11 +1,14 @@
-from crowdstrike.foundry.function.model import Request, RequestParams, Response
+"""Data mapping utilities for CrowdStrike Foundry Function FDK."""
+
+
 from dataclasses import dataclass, fields, is_dataclass
-from typing import Dict
+from typing import Union
+from crowdstrike.foundry.function.model import Request, RequestParams, Response
 
 
-def response_to_dict(r: Response) -> Dict:
-    """
-    Converts a :class:`Response` to a dictionary.
+def response_to_dict(r: Response) -> dict:
+    """Convert a :class:`Response` to a dictionary.
+
     :param r: :class:`Response` instance to convert.
     :return: Dictionary version of the provided instance.
     """
@@ -30,9 +33,9 @@ def response_to_dict(r: Response) -> Dict:
     return d
 
 
-def dict_to_request(d: Dict) -> Request:
-    """
-    Converts a dictionary to a :class:`Request`.
+def dict_to_request(d: dict) -> Request:
+    """Convert a dictionary to a :class:`Request`.
+
     :param d: Dictionary instance to attempt to map.
     :return: :class:`Request` instance populated by the given dictionary.
     """
@@ -46,9 +49,9 @@ def dict_to_request(d: Dict) -> Request:
     return req
 
 
-def dict_to_dataclass(d: Dict, dc) -> [None, dataclass]:
-    """
-    Maps the contents of a dictionary to a dataclass object.
+def dict_to_dataclass(d: Union[dict, None], dc) -> Union[None, dataclass]:
+    """Map the contents of a dictionary to a dataclass object.
+
     :param d: Dictionary from which to extract values.
     :param dc: Dataclass to receive the values.
     :return: Provided dataclass object.
@@ -73,8 +76,8 @@ def dict_to_dataclass(d: Dict, dc) -> [None, dataclass]:
 
 
 def canonize_header(h: str) -> str:
-    """
-    Converts a header key into its canonical version.
+    """Convert a header key into its canonical version.
+
     :param h: Header key.
     :return: Canonized version.
     """
