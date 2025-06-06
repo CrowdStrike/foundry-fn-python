@@ -17,6 +17,12 @@ authors:
   - given-names: Johnny
     family-names: Steenbergen
     affiliation: CrowdStrike
+  - given-names: Banu
+    family-names: Yuceer
+    affiliation: CrowdStrike
+  - given-names: Joshua
+    family-names: Hiller
+    affiliation: CrowdStrike
 repository-code: 'https://github.com/CrowdStrike/foundry-fn-python'
 url: 'https://www.crowdstrike.com'
 repository-artifact: 'https://pypi.org/project/crowdstrike-foundry-function/'
@@ -31,7 +37,7 @@ keywords:
   - crowdstrike-api
   - crowdstrike-falcon-api
   - crowdstrike-foundry
-  - crowdstrike-ffaas
+  - crowdstrike-faas
   - python
   - windows
   - linux

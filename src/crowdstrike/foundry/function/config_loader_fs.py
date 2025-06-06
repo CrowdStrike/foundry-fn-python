@@ -1,21 +1,22 @@
+"""File system config loader for CrowdStrike Foundry Functions FDK."""
 import json
 import os
 from crowdstrike.foundry.function.config_loader import ConfigLoaderBase
 
 
 class FileSystemConfigLoader(ConfigLoaderBase):
-    """
-    Loads configuration from the local filesystem.
-    """
+    """Loads configuration from the local filesystem."""
 
     def __init__(self):
+        """Initialize the file system config loader."""
         ConfigLoaderBase.__init__(self)
 
     def load(self):
-        """
-        Loads the configuration located at the path specified in the `CS_FN_CONFIG_PATH` environment variable.
+        """Load the configuration located at the path specified in the `CS_FN_CONFIG_PATH` environment variable.
+
         The path may be either relative or absolute.
         If the environment variable is not provided, no configuration will be loaded.
+
         :returns: Any loaded configuration.
         """
         file_path = os.environ.get('CS_FN_CONFIG_PATH', None)

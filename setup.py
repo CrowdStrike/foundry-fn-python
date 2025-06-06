@@ -1,8 +1,8 @@
 # !/usr/bin/env python
+"""Package setup for crowdstrike-foundry-function."""
 
 import os
 from setuptools import setup
-from typing import List
 
 DESCRIPTION = 'CrowdStrike Foundry Function Software Developer Kit for Python'
 PACKAGE_NAME = 'crowdstrike.foundry.function'
@@ -16,10 +16,11 @@ PYTHON_VERSION = '>=3.8.0'
 SETUP_REQUIRES = [
     'setuptools',
 ]
-VERSION = '1.1.0'
+VERSION = '1.1.1'
 
 
 def main():
+    """Build crowdstrike-foundry-function package."""
     setup(
         description=DESCRIPTION,
         install_requires=find_dependencies(os.path.join(os.path.dirname(__file__), "requirements.txt")),
@@ -34,12 +35,14 @@ def main():
     )
 
 
-def find_dependencies(requirements) -> List[str]:
+def find_dependencies(requirements) -> list[str]:
+    """Parse the package dependencies from requirements file."""
     with open(requirements, 'r') as reqs:
         return [line for line in sanitized_lines(reqs.readlines())]
 
 
 def long_description() -> str:
+    """Generate package long description."""
     with open("README.md", "r", encoding="utf-8") as fh:
         descript = fh.read()
 
@@ -53,7 +56,8 @@ def long_description() -> str:
     return descript
 
 
-def sanitized_lines(lines: List[str]):
+def sanitized_lines(lines: list[str]):
+    """Sanitize the lines read from requirements file."""
     for line in lines:
         line = line.strip()
         if line != '' and line[0] != '#':

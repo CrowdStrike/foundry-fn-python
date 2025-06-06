@@ -1,30 +1,35 @@
-from crowdstrike.foundry.function.model import FDKException, Request, Response
+"""Router for CrowdStrike Foundry Function FDK."""
 from dataclasses import dataclass
 from http.client import BAD_REQUEST, METHOD_NOT_ALLOWED, NOT_FOUND, SERVICE_UNAVAILABLE
 from inspect import signature
 from logging import Logger
-from typing import Callable
+from typing import Callable, Union
+from crowdstrike.foundry.function.model import FDKException, Request, Response
 
 
 @dataclass
 class Route:
+    """Defines the Route data model."""
+
     func: Callable
     method: str
     path: str
 
 
 class Router:
-    """
-    Serves to route function requests to the appropriate handler functions.
-    """
+    """Serves to route function requests to the appropriate handler functions."""
 
     def __init__(self, config):
+        """Initialize the router.
+
+        :param config: The config loaded from the configuration file, if provided.
+        """
         self._config = config
         self._routes = {}
 
-    def route(self, req: Request, logger: [Logger, None] = None) -> Response:
-        """
-        Given the method and path of a :class:`Request`, invokes the corresponding handler if one exists.
+    def route(self, req: Request, logger: Union[Logger, None] = None) -> Response:
+        """Given the method and path of a :class:`Request`, invokes the corresponding handler if one exists.
+
         :param req: :class:`Request` presented to the function.
         :param logger: :class:`Logger` instance. Note: A CrowdStrike-specific logging instance will be provided
         internally.
@@ -49,7 +54,7 @@ class Router:
 
         return self._call_route(r, req, logger)
 
-    def _call_route(self, route: Route, req: Request, logger: [Logger, None] = None):
+    def _call_route(self, route: Route, req: Request, logger: Union[Logger, None] = None):
         f = route.func
         len_params = len(signature(f).parameters)
 
@@ -61,8 +66,8 @@ class Router:
         return f(req)
 
     def register(self, r: Route):
-        """
-        Registers a :class:`Route` with this instance.
+        """Register a :class:`Route` with this instance.
+
         :param r: :class:`Route` to register.
         """
         r.method = r.method.upper().strip()

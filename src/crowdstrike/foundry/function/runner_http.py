@@ -1,15 +1,17 @@
+"""HTTP runner for CrowdStrike Foundry Function FDK."""
 import json
 import os
+from sys import stdout
+from http.client import INTERNAL_SERVER_ERROR
+from http.server import BaseHTTPRequestHandler, HTTPServer
+from logging import Formatter, Logger, StreamHandler, getLogger
 import python_multipart
+from typing import Dict, List, Union
 from crowdstrike.foundry.function.context import ctx_request
 from crowdstrike.foundry.function.mapping import canonize_header, dict_to_request, response_to_dict
 from crowdstrike.foundry.function.model import APIError, FDKException, Request, Response
 from crowdstrike.foundry.function.router import Router
 from crowdstrike.foundry.function.runner import RunnerBase
-from http.client import INTERNAL_SERVER_ERROR
-from http.server import BaseHTTPRequestHandler, HTTPServer
-from logging import Formatter, Logger, StreamHandler, getLogger
-from sys import stdout
 
 
 def _new_http_logger() -> Logger:
@@ -18,22 +20,22 @@ def _new_http_logger() -> Logger:
     h = StreamHandler(stdout)
     h.setFormatter(f)
 
-    l = getLogger("cs-logger")
-    l.setLevel('DEBUG')
-    l.addHandler(h)
-    return l
+    logger = getLogger("cs-logger")
+    logger.setLevel('DEBUG')
+    logger.addHandler(h)
+    return logger
 
 
 class HTTPRunner(RunnerBase):
-    """
-    Runs the user's code as part of an HTTP server.
-    """
+    """Runs the user's code as part of an HTTP server."""
 
     def __init__(self):
+        """Initialize the HTTP runner."""
         RunnerBase.__init__(self)
         self._port = int(os.environ.get('PORT', '8081'))
 
     def run(self, *args, **kwargs):
+        """Start the HTTP server and listen for requests."""
         logger = kwargs.get('logger', None)
         if logger is None:
             logger = _new_http_logger()
@@ -45,57 +47,47 @@ class HTTPRunner(RunnerBase):
 
 
 class HTTPRequestHandler(BaseHTTPRequestHandler):
+    """Implements the HTTP request handlers."""
+
     _logger = None
     _router = None
 
     @staticmethod
     def bind_logger(logger: Logger):
+        """Set the logger to use."""
         HTTPRequestHandler._logger = logger
 
     @staticmethod
     def bind_router(router: Router):
+        """Set the router to use."""
         HTTPRequestHandler._router = router
 
     def do_DELETE(self):
-        """
-        Executes on HTTP DELETE.
-        """
+        """Execute on HTTP DELETE."""
         self._exec_request()
 
     def do_GET(self):
-        """
-        Executes on HTTP GET.
-        """
+        """Execute on HTTP GET."""
         self._exec_request()
 
     def do_HEAD(self):
-        """
-        Executes on HTTP HEAD.
-        """
+        """Execute on HTTP HEAD."""
         self._exec_request()
 
     def do_OPTIONS(self):
-        """
-        Executes on HTTP OPTIONS.
-        """
+        """Execute on HTTP OPTIONS."""
         self._exec_request()
 
     def do_PATCH(self):
-        """
-        Executes on HTTP PATCH.
-        """
+        """Execute on HTTP PATCH."""
         self._exec_request()
 
     def do_POST(self):
-        """
-        Executes on HTTP POST.
-        """
+        """Execute on HTTP POST."""
         self._exec_request()
 
     def do_PUT(self):
-        """
-        Executes on HTTP PUT.
-        """
+        """Execute on HTTP PUT."""
         self._exec_request()
 
     def _exec_request(self):
@@ -140,7 +132,7 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
                 body = json.loads(value.decode('utf-8').strip())
 
         def on_file(file):
-            nonlocal files
+            nonlocal files  # noqa: F824
             # Offset will currently be at the end of the buffer.
             # Need to reset it to the beginning so we can read it.
             file.file_object.seek(0)
@@ -152,7 +144,7 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
         req['files'] = files
         return req
 
-    def _write_response(self, req: Request, resp: [Response, None]):
+    def _write_response(self, req: Request, resp: Union[Response, None]):
         if resp is None or not isinstance(resp, Response):
             msg = f'Object is not of type {Response.__base__.__name__}. Got {type(resp)} instead.'
             resp = Response(errors=[APIError(code=INTERNAL_SERVER_ERROR, message=msg)])
@@ -196,7 +188,7 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
         headers = {k: ';'.join(v) for k, v in headers}
         return headers
 
-    def _take_header(self, key: str, src_header: dict[str, list[str]], dst_header: dict[str, list[str]]):
+    def _take_header(self, key: str, src_header: Dict[str, List[str]], dst_header: Dict[str, List[str]]):
         value = src_header.get(key, [])
         if len(value) == 0:
             return

@@ -1,0 +1,7 @@
+{
+    "method": "GET",
+    "url": "/request1",
+    "body": {
+        "hello": "world"
+    }
+}

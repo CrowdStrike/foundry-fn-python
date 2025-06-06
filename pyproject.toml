@@ -1,9 +1,57 @@
+[build-system]
+requires = ['setuptools>=67.7.2']
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "crowdstrike-foundry-function"
 description = "CrowdStrike Foundry Function Software Developer Kit for Python"
 requires-python = ">=3.8.0"
 dynamic = ['dependencies', 'version']
 readme = "README.md"
+authors = [
+    { name = "CrowdStrike", email = "foundry-fn-python@crowdstrike.com" },
+]
+maintainers = [
+    { name = "John Stone", email = "foundry-fn-python@crowdstrike.com" },
+    { name = "Chris Cannon", email = "foundry-fn-python@crowdstrike.com" },
+    { name = "Johnny Steenbergen", email = "foundry-fn-python@crowdstrike.com" },
+    { name = "Banu Yuceer", email = "foundry-fn-python@crowdstrike.com" },
+    { name = "Joshua Hiller", email = "foundry-fn-python@crowdstrike.com" },
+]
+keywords = [
+    "crowdstrike",
+    "crowdstrike-falcon-foundry",
+    "foundry",
+    "foundry-functions",
+    "crowdstrike-faas",
+    "sdk"
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Framework :: Flake8",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: The Unlicense (Unlicense)",
+    "Natural Language :: English",
+    "Operating System :: MacOS",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: OS Independent",
+    "Operating System :: POSIX",
+    "Operating System :: POSIX :: Linux",
+    "Operating System :: Unix",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Security",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: System :: Systems Administration",
+    "Topic :: Utilities",
+]
 
-[build-system]
-requires = ['setuptools>=67.7.2']
+[project.urls]
+Homepage = "https://github.com/CrowdStrike/foundry-fn-python"
+Tracker = "https://github.com/CrowdStrike/foundry-fn-python/issues"
