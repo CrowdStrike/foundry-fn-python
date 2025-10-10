@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "crowdstrike-foundry-function"
 description = "CrowdStrike Foundry Function Software Developer Kit for Python"
-requires-python = ">=3.8.0"
+requires-python = ">=3.9.0"
 dynamic = ['dependencies', 'version']
 readme = "README.md"
 authors = [
@@ -40,7 +40,6 @@ classifiers = [
     "Operating System :: Unix",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
