@@ -41,7 +41,6 @@ functions:
             disruptive: false
             system_action: false
             tags:
-                - aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                 - complex-fn-python-example
                 - Utility
           permissions: []
