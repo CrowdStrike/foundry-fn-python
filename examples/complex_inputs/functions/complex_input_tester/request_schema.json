@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "files": {
+      "type": "array",
+      "title": "Files",
+      "description": "LogScale files to process. Expected to be JSON.",
+      "items": {
+        "type": "string",
+        "format": "downloadableFile"
+      }
+    },
+    "file2": {
+      "title": "Other File",
+      "description": "Some other file field.",
+      "type": "string",
+      "format": "downloadableFile"
+    },
+    "name": {
+      "type": "string",
+      "title": "Name",
+      "description": "First name of the user."
+    },
+    "age": {
+      "type": "integer",
+      "title": "Age",
+      "description": "Age of the user."
+    }
+  },
+  "required": [
+  ]
+}
