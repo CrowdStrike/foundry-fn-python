@@ -1,7 +1,7 @@
 curl -X POST --location "http://localhost:8081" \
     -H "Content-Type: multipart/form-data" \
     -F meta='{
-          "url": "/my-endpoint",
+          "url": "/complex-test",
           "method": "POST"
       }' \
     -F body='{

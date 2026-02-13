@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "allText": {
+      "type": "string",
+      "title": "File Contents"
+    },
+    "greeting": {
+      "type": "string",
+      "title": "Greeting"
+    }
+  },
+  "required": [
+  ]
+}

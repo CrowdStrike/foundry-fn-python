@@ -1,0 +1,1 @@
+crowdstrike-foundry-function==1.1.3

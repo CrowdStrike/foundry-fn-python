@@ -1,0 +1,53 @@
+name: complex-fn-python-example
+description: ""
+logo: ""
+vendor: ""
+vendor_products: []
+use_case: Cloud security
+manifest_version: "2023-05-09"
+ignored:
+    - .+/node_modules$
+    - .+/node_modules/.+
+    - .+/venv$
+    - .+/venv/.+
+ui:
+    homepage: ""
+    extensions: []
+    pages: {}
+    dashboards: {}
+    navigation: {}
+api_integrations: []
+rtr_scripts: []
+collections: []
+auth:
+    scopes: []
+    permissions: {}
+    roles: []
+functions:
+    - name: complex_input_tester
+      config: null
+      description: Exercises reading in a variety of input types, including an array of files.
+      path: functions/complex_input_tester
+      environment_variables: {}
+      handlers:
+        - name: handle_complex_inputs
+          description: Exercises reading in a variety of input types, including an array of files.
+          method: POST
+          api_path: /complex-test
+          payload_type: complex
+          request_schema: request_schema.json
+          response_schema: response_schema.json
+          workflow_integration:
+            disruptive: false
+            system_action: false
+            tags:
+                - complex-fn-python-example
+                - Utility
+          permissions: []
+      language: python
+workflows: []
+parsers: []
+logscale:
+    saved_searches: []
+lookup_files: []
+docs: {}
