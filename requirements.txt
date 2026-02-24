@@ -1,4 +1,4 @@
 build>=1.0.3
 pytest>=9.0.2
 python-multipart>=0.0.20
-urllib3>=2.6.1
+urllib3>=2.6.3
