@@ -24,6 +24,9 @@ def main():
     setup(
         description=DESCRIPTION,
         install_requires=find_dependencies(os.path.join(os.path.dirname(__file__), "requirements.txt")),
+        extras_require={
+            "dev": find_dependencies(os.path.join(os.path.dirname(__file__), "requirements-dev.txt")),
+        },
         name=PACKAGE_NAME,
         package_dir=PACKAGE_DIR,
         packages=PACKAGES,
