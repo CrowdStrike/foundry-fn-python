@@ -1,0 +1,4 @@
+# These packages aren't needed to run a Foundry function.
+# They're only required to test or build this SDK.
+build>=1.6.1
+pytest>=9.2.0

@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "crowdstrike-foundry-function"
 description = "CrowdStrike Foundry Function Software Developer Kit for Python"
 requires-python = ">=3.10.0"
-dynamic = ['dependencies', 'version']
+dynamic = ['dependencies', 'optional-dependencies', 'version']
 readme = "README.md"
 authors = [
     { name = "CrowdStrike", email = "foundry-fn-python@crowdstrike.com" },
